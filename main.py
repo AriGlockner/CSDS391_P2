@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 
+from numpy import pi
+
 
 def plot_data(d):
     for r in d:
@@ -23,6 +25,7 @@ def plot_data(d):
     plt.xlabel('Petal Length')
     plt.ylabel('Petal Width')
     pass
+
 
 def k_means_cluster(k, data):
     '''
@@ -77,11 +80,39 @@ def k_means_cluster(k, data):
                 average_y += j[1]
             if len(points[i]) != 0:
                 means[i] = [average_x / len(points[i]), average_y / len(points[i])]
-        print(means)
 
     return means
 
-# returns the distance between 2 points
+
+def get_objective_function(d, mean, means):
+    x_distance = 0.0
+    y_distance = 0.0
+    num_points = 0.0
+
+    for r in d:
+        closest_mean = get_closest_mean(r, means)
+
+        if np.array_equal(mean, closest_mean):
+            num_points += 1.0
+            x_distance += abs(float(r[1]) - mean[0])
+            y_distance += abs(float(r[2]) - mean[1])
+
+    return [x_distance / num_points, y_distance / num_points]
+
+
+def get_closest_mean(r, means):
+    distance = 99.9
+    closest_mean = [0.0, 0.0]
+
+    for mean in means:
+        d = get_distance([float(r[1]), float(r[2])], mean)
+        #print(str(d) + ' < ' + str(distance))
+
+        if d < distance:
+            distance = d
+            closest_mean = [float(mean[0]), float(mean[1])]
+
+    return closest_mean
 
 
 def get_distance(pa, pb):
@@ -106,6 +137,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
     # k-means clustering
     k = [1, 2, 3, 4, 5]
+    t = np.linspace(0, 2 * pi, 200)
 
     for numMeans in k:
         plot_data(data)
@@ -113,6 +145,10 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
         for point in uk:
             plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
+            D = get_objective_function(data, point, uk)
+            print(D)
+            plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
+
 
         plt.show()
 
