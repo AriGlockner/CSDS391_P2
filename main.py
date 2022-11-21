@@ -3,6 +3,27 @@ import matplotlib.pyplot as plt
 import csv
 
 
+def plot_data(d):
+    for r in d:
+        # Get the color based on the species
+        c = 'black'
+        if r[4] == 'setosa':
+            c = 'blue'
+        elif r[4] == 'versicolor':
+            c = 'red'
+        elif r[4] == 'virginica':
+            c = 'green'
+        else:
+            c = 'black'
+
+        # plot the species
+        plt.plot(float(r[1]), float(r[2]), linestyle='none', marker='o', color=c)
+
+    # Format Graph
+    plt.xlabel('Petal Length')
+    plt.ylabel('Petal Width')
+    pass
+
 def k_means_cluster(k, data):
     '''
     uki = Sum(n, rnk * xni) / Sum(n, rnk)
@@ -75,34 +96,21 @@ with open('CSDS391_P2\irisdata.csv') as file:
     iris = csv.reader(file)
     data = []
 
-    # Plot the iris data
+    # Get the iris data stored as variable data
     for row in iris:
         # Add the iris data to the data 2D array
         data.append(row)
 
-        # Get the color based on the species
-        color = 'black'
-        if row[4] == 'setosa':
-            color = 'blue'
-        elif row[4] == 'versicolor':
-            color = 'red'
-        elif row[4] == 'virginica':
-            color = 'green'
-        else:
-            color = 'black'
+    # plot data
+    plot_data(data)
 
-        # plot the species
-        plt.plot(float(row[1]), float(row[2]), linestyle='none', marker='o', color=color)
-
-    # Format of Graph
-    plt.xlabel('Petal Length')
-    plt.ylabel('Petal Width')
-
+    '''
     # k-means clustering
     uk2 = k_means_cluster(2, data)
 
     for point in uk2:
         plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
+    '''
 
     # Show the plot
     plt.show()
