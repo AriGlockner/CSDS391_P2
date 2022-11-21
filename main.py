@@ -27,7 +27,7 @@ def plot_data(d):
     pass
 
 
-def k_means_cluster(k, data):
+def k_means_cluster(k, d):
     '''
     uki = Sum(n, rnk * xni) / Sum(n, rnk)
     xn = nth data vector
@@ -42,11 +42,11 @@ def k_means_cluster(k, data):
 
     means = []
     points = []
-    num_data_points = len(data)
+    num_data_points = len(d)
 
     # Initialize the first k-points to become the means of the data set
     for i in range(k):
-        means.append([float(data[int(num_data_points * i / k)][1]), float(data[int(num_data_points * i / k)][2])])
+        means.append([float(d[int(num_data_points * i / k)][1]), float(d[int(num_data_points * i / k)][2])])
         points.append([])
 
     # Repeat updating the mean
@@ -54,7 +54,7 @@ def k_means_cluster(k, data):
         # Categorize each data point to its closest mean and update that mean's coordinates
         for r in range(num_data_points):
             # get the data point
-            pt = [float(data[k][1]), float(data[r][2])]
+            pt = [float(d[k][1]), float(d[r][2])]
 
             # find the mean closest to it
             distance = get_distance(pt, means[0])
@@ -85,14 +85,16 @@ def k_means_cluster(k, data):
 
 
 def get_objective_function(d, mean, means):
+    # Returns the objective function
     x_distance = 0.0
     y_distance = 0.0
     num_points = 0.0
 
     for r in d:
+        # Get the closest average point
         closest_mean = get_closest_mean(r, means)
 
-        # If the
+        # If the closest average point is the average point
         if np.array_equal(mean, closest_mean):
             num_points += 1.0
             x_distance += abs(float(r[1]) - mean[0])
@@ -102,6 +104,7 @@ def get_objective_function(d, mean, means):
 
 
 def get_closest_mean(r, means):
+    # returns the mean that is closest to the point
     distance = 99.9
     closest_mean = [0.0, 0.0]
 
@@ -118,6 +121,7 @@ def get_closest_mean(r, means):
 
 
 def get_distance(pa, pb):
+    # returns the distance between 2 points
     return abs(pa[0] - pb[0]) + abs(pa[1] - pb[1])
 
 
@@ -157,7 +161,14 @@ with open('CSDS391_P2\irisdata.csv') as file:
             D = get_objective_function(data, point, uk)
             plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
 
-        
+        '''
+        Plot decision boundaries
+        Possible ideas:
+        1. Take averages between points and use that to get lines
+        2. Use likelihood function
+        3. Go back and reread the lecture slides for another idea
+        '''
+
         plt.show()
 
     # Show the plot
