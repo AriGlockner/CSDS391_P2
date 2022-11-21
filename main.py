@@ -104,13 +104,17 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # plot data
     plot_data(data)
 
-    '''
     # k-means clustering
-    uk2 = k_means_cluster(2, data)
+    k = [1, 2, 3, 4, 5]
 
-    for point in uk2:
-        plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
-    '''
+    for numMeans in k:
+        plot_data(data)
+        uk = k_means_cluster(numMeans, data)
+
+        for point in uk:
+            plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
+
+        plt.show()
 
     # Show the plot
     plt.show()
