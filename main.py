@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 
+
 def k_means_cluster(k, data):
     '''
     uki = Sum(n, rnk * xni) / Sum(n, rnk)
@@ -32,12 +33,12 @@ def k_means_cluster(k, data):
             pt = [float(data[k][1]), float(data[r][2])]
 
             # find the mean closest to it
-            distance = getDistance(pt, means[0])
+            distance = get_distance(pt, means[0])
             mean = 0
 
             # check for closer distances
             for i in range(k):
-                temp_distance = getDistance(pt, means[i])
+                temp_distance = get_distance(pt, means[i])
                 if temp_distance < distance:
                     mean = i
                     distance = temp_distance
@@ -60,8 +61,11 @@ def k_means_cluster(k, data):
     return means
 
 # returns the distance between 2 points
-def getDistance(pa, pb):
+
+
+def get_distance(pa, pb):
     return abs(pa[0] - pb[0]) + abs(pa[1] - pb[1])
+
 
 with open('CSDS391_P2\irisdata.csv') as file:
     # Used to take out the header from the file
