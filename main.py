@@ -92,6 +92,7 @@ def get_objective_function(d, mean, means):
     for r in d:
         closest_mean = get_closest_mean(r, means)
 
+        # If the
         if np.array_equal(mean, closest_mean):
             num_points += 1.0
             x_distance += abs(float(r[1]) - mean[0])
@@ -105,9 +106,10 @@ def get_closest_mean(r, means):
     closest_mean = [0.0, 0.0]
 
     for mean in means:
+        # Get distance between the current point and the mean
         d = get_distance([float(r[1]), float(r[2])], mean)
-        #print(str(d) + ' < ' + str(distance))
 
+        # If current average is closer to the point than the prior average, make the prior average the current average
         if d < distance:
             distance = d
             closest_mean = [float(mean[0]), float(mean[1])]
@@ -140,16 +142,22 @@ with open('CSDS391_P2\irisdata.csv') as file:
     t = np.linspace(0, 2 * pi, 200)
 
     for numMeans in k:
+        # Plot data points
         plot_data(data)
+
+        # Get averages
         uk = k_means_cluster(numMeans, data)
 
+        # For each mean, plot the mean and the objective function
         for point in uk:
+            # Plot averages:
             plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
+
+            # Plot Objective Function:
             D = get_objective_function(data, point, uk)
-            print(D)
             plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
 
-
+        
         plt.show()
 
     # Show the plot
