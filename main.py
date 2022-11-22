@@ -19,7 +19,6 @@ def plot_data(d):
             c = 'black'
 
         # plot the species
-        #plt.plot(float(r[1]), float(r[2]), linestyle='none', marker='o', color=c)
         plt.plot(float(r[2]), float(r[3]), linestyle='none', marker='o', color=c)
 
     # Format Graph
@@ -43,20 +42,31 @@ def k_means_cluster(k, d):
 
     means = []
     points = []
-    num_data_points = len(d)
 
     # Initialize the first means of the data set
     for i in range(k):
-        means.append([float(d[int(num_data_points * i / k)][1]), float(d[int(num_data_points * i / k)][2])])
+        means.append([float(d[int(i * len(d) / k)][2]), float(d[int(i * len(d) / k)][3])])
         points.append([])
 
-    # Repeat updating the mean
-    for a in range(5):
-        # Categorize each data point to its closest mean and update that mean's coordinates
-        for r in range(num_data_points):
-            # get the data point
-            pt = [float(d[k][1]), float(d[r][2])]
+    count = 0
 
+    # Repeat updating the mean
+    while True:
+        print(count)
+        count += 1
+        last_means = means.copy()
+
+        # Empty points
+        points = []
+        for i in range(k):
+            points.append([])
+
+        # Categorize each data point to its closest mean and update that mean's coordinates
+        for r in range(len(d)):
+            # get the data point
+            pt = [float(d[k][2]), float(d[r][3])]
+
+            '''
             # find the mean closest to it
             distance = get_distance(pt, means[0])
             mean = 0
@@ -67,9 +77,17 @@ def k_means_cluster(k, d):
                 if temp_distance < distance:
                     mean = i
                     distance = temp_distance
+            '''
+            mean = get_closest_mean(pt, means)
+            index = -1
+
+            for i in range(len(means)):
+                if mean == means[i]:
+                    index = i
+                    break
 
             # categorize the point to a mean
-            points[mean].append(pt)
+            points[index].append(pt)
 
         # Update mean by shifting it to the average for each item in the cluster
         for i in range(k):
@@ -82,7 +100,8 @@ def k_means_cluster(k, d):
             if len(points[i]) != 0:
                 means[i] = [average_x / len(points[i]), average_y / len(points[i])]
 
-    return means
+        if means == last_means:
+            return means
 
 
 def get_objective_function(d, mean, means):
@@ -98,8 +117,8 @@ def get_objective_function(d, mean, means):
         # If the closest average point is the average point
         if np.array_equal(mean, closest_mean):
             num_points += 1.0
-            x_distance += abs(float(r[1]) - mean[0])
-            y_distance += abs(float(r[2]) - mean[1])
+            x_distance += pow(abs(float(r[2]) - mean[0]), 2)
+            y_distance += pow(abs(float(r[3]) - mean[1]), 2)
 
     return [x_distance / num_points, y_distance / num_points]
 
@@ -111,7 +130,8 @@ def get_closest_mean(r, means):
 
     for mean in means:
         # Get distance between the current point and the mean
-        d = get_distance([float(r[1]), float(r[2])], mean)
+        # TODO: might need to change from [0, 1] back to [2, 3]
+        d = get_distance([float(r[0]), float(r[1])], mean)
 
         # If current average is closer to the point than the prior average, make the prior average the current average
         if d < distance:
@@ -140,11 +160,10 @@ with open('CSDS391_P2\irisdata.csv') as file:
         data.append(row)
 
     # plot data
-    plot_data(data)
+    #plot_data(data)
 
-    '''
     # k-means clustering
-    k = [1, 2, 3, 4, 5]
+    k = [1, 2, 3, 4]
     t = np.linspace(0, 2 * pi, 200)
 
     for numMeans in k:
@@ -160,18 +179,24 @@ with open('CSDS391_P2\irisdata.csv') as file:
             plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
 
             # Plot Objective Function:
-            D = get_objective_function(data, point, uk)
-            plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
-        
-        Plot decision boundaries
-        Possible ideas:
-        1. Take averages between points and use that to get lines (vernoi diagram)
-        2. Use likelihood function
-        3. k neighbors/centroids
-        Go back and reread the lecture slides for another idea
-        '''
+            # = get_objective_function(data, point, uk)
+            #plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
 
-    # plt.show()
+        plt.show()
+
+    '''
+    Plot decision boundaries
+    Possible ideas:
+    1. Take averages between points and use that to get lines (vernoi diagram)
+    2. Use likelihood function
+    3. k neighbors/centroids
+    Go back and reread the lecture slides for another idea
+    '''
+
+    '''
+    Exercise 2B:
+    just do an equation to approximate linear bound
+    '''
 
     # Show the plot
     plt.show()
