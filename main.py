@@ -19,7 +19,8 @@ def plot_data(d):
             c = 'black'
 
         # plot the species
-        plt.plot(float(r[1]), float(r[2]), linestyle='none', marker='o', color=c)
+        #plt.plot(float(r[1]), float(r[2]), linestyle='none', marker='o', color=c)
+        plt.plot(float(r[2]), float(r[3]), linestyle='none', marker='o', color=c)
 
     # Format Graph
     plt.xlabel('Petal Length')
@@ -34,7 +35,7 @@ def k_means_cluster(k, d):
     rnk is 1 if xn is in the kth class, otherwise 0
 
     Algorithm:
-    1) Initialize k points (use 1st k points as means)
+    1) Initialize k points as means
     2) Categorize each data point to its closest mean and update the mean's coordinates
     (which are the averages of the number of items categorized in that cluster so far)
     3) repeat the process for a given number of iterations and at the end we have our clusters
@@ -44,7 +45,7 @@ def k_means_cluster(k, d):
     points = []
     num_data_points = len(d)
 
-    # Initialize the first k-points to become the means of the data set
+    # Initialize the first means of the data set
     for i in range(k):
         means.append([float(d[int(num_data_points * i / k)][1]), float(d[int(num_data_points * i / k)][2])])
         points.append([])
@@ -141,6 +142,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # plot data
     plot_data(data)
 
+    '''
     # k-means clustering
     k = [1, 2, 3, 4, 5]
     t = np.linspace(0, 2 * pi, 200)
@@ -160,16 +162,16 @@ with open('CSDS391_P2\irisdata.csv') as file:
             # Plot Objective Function:
             D = get_objective_function(data, point, uk)
             plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
-
-        '''
+        
         Plot decision boundaries
         Possible ideas:
-        1. Take averages between points and use that to get lines
+        1. Take averages between points and use that to get lines (vernoi diagram)
         2. Use likelihood function
-        3. Go back and reread the lecture slides for another idea
+        3. k neighbors/centroids
+        Go back and reread the lecture slides for another idea
         '''
 
-        plt.show()
+    # plt.show()
 
     # Show the plot
     plt.show()
