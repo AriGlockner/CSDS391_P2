@@ -51,14 +51,13 @@ def k_means_cluster(k, d):
         for average in averages:
             plt.plot(average[0], average[1], color='black', marker='o', linestyle='none')
 
-        # Get and plot the Objective Function
-        D = get_objective_function(d, averages)
-        print(D)
-        objective_function.append(D)
+        # Get a data point for the Objective Function
+        objective_function.append(get_objective_function(d, averages))
 
         # Show the graph
         plt.title('k-means clustering for ' + str(k) + ' Clusters')
-        plt.show()
+        # TODO: Uncomment
+        # plt.show()
 
         # Make sure that each iteration is changing the averages
         last_averages = averages.copy()
@@ -93,7 +92,7 @@ def k_means_cluster(k, d):
             plt.show()
 
             # Return the centroids of the clusters
-            return averages
+            return [averages, objective_function]
 
 
 def get_objective_function(d, means):
@@ -109,6 +108,38 @@ def get_objective_function(d, means):
         sse += math.pow(get_distance([float(r[2]), float(r[3])], get_closest_mean([float(r[2]), float(r[3])], means)), 2)
 
     return sse
+
+
+def get_decision_bounds(point1, point2):
+    '''
+    If y - a = m(x - b) will give the line containing both points 1 and 2, then y = b - (x - a)/m will be the line
+    containing the midpoint between a and b and be perpendicular to the line containing a and b
+
+    :param point1:
+    :param point2:
+    :return:
+    '''
+    # Intercept point (halfway between the two points in the parameters)
+    x_constant = (point1[0] + point2[0]) / 2.0
+    y_constant = (point1[1] + point2[1]) / 2.0
+
+    # line
+    x_axis = np.linspace(0.0, 7.0, 200)
+    # Slope of the line (if y = mx + b for the line )
+    slope = abs(point2[0] - point1[0]) / abs(point2[1] - point1[1])
+    return y_constant - (x_axis - x_constant) / slope
+
+
+def mse(d, means):
+
+    return get_objective_function(d, means) / 150.0
+
+'''
+3a)
+average of the square of the distances between the centroid and the points over the entire population
+
+Objective function divided by n
+'''
 
 
 def get_closest_mean(r, means):
@@ -147,14 +178,63 @@ with open('CSDS391_P2\irisdata.csv') as file:
         data.append(row)
 
     # k-means clustering
-    k = [1, 2, 3, 4]
+    k = [3]
 
     # uk = k_means_cluster(2, data)
+    uk = []
+    d = []
 
     for num_clusters in k:
-        uk = k_means_cluster(num_clusters, data)
+        output = k_means_cluster(num_clusters, data)
+        uk.append(output[0])
+        d.append(output[1])
 
+        print(uk)
+        print(d)
 
+        plot_data(data)
+
+        '''
+        for index in range(len(uk)):
+            plt.plot(uk[index][1], uk[index][0], 'ko', linestyle='none')
+
+            avg = [0.0, 0.0]
+
+            for index2 in range(index + 1, len(uk)):
+                print(str(index) + ' ' + str(index2))
+                print(index == index2)
+                print(uk[index] == uk[index2])
+
+        plt.show()
+        '''
+        print()
+        print(len(uk[0]))
+        print()
+
+        for index in range(len(uk[0])):
+            p1 = [uk[0][index][0], uk[0][index][1]]
+            plt.plot(p1[0], p1[1], 'ko', linestyle='none')
+
+            for index2 in range((index+1), len(uk[0])):
+                p2 = uk[0][index2][0], uk[0][index2][1]
+
+                x = (p1[0] + p2[0]) / 2.0
+                y = (p1[1] + p2[1]) / 2.0
+
+                # point
+                # plt.plot(x, y, 'co', linestyle='none', linewidth=0.5)
+
+                # line
+                t = np.linspace(0.0, 7.0, 200)
+                m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
+                line = y-(t-x)/m
+                # TODO: Use likelihood function to determine if it should graph or not
+                plt.plot(t, line, 'c-')
+
+        plt.show()
+    '''
+    Plot decision boundaries for dataset using 
+    '''
 
     '''
     Plot decision boundaries
