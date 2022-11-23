@@ -1,3 +1,4 @@
+import math
 import random
 
 import numpy as np
@@ -41,11 +42,22 @@ def k_means_cluster(k, d):
         # Set the average cluster in the averages array
         averages[index] = [float(d[random_point][2]), float(d[random_point][3])]
 
+    # Objective Function
+    objective_function = []
+
     while True:
         # Plot the data and the averages
         plot_data(d)
         for average in averages:
             plt.plot(average[0], average[1], color='black', marker='o', linestyle='none')
+
+        # Get and plot the Objective Function
+        D = get_objective_function(d, averages)
+        print(D)
+        objective_function.append(D)
+
+        # Show the graph
+        plt.title('k-means clustering for ' + str(k) + ' Clusters')
         plt.show()
 
         # Make sure that each iteration is changing the averages
@@ -72,26 +84,31 @@ def k_means_cluster(k, d):
 
         # If the cluster points did not shift locations, return the clusters
         if last_averages == averages:
+            # Plot Objective Function
+            plt.plot(range(len(objective_function)), objective_function, 'ko')
+            plt.plot(range(len(objective_function)), objective_function, 'k')
+            plt.xlabel('Iteration')
+            plt.ylabel('Sum of Error Squared')
+            plt.title('Objective Function for ' + str(k) + ' Clusters')
+            plt.show()
+
+            # Return the centroids of the clusters
             return averages
 
 
-def get_objective_function(d, mean, means):
-    # Returns the objective function
-    x_distance = 0.0
-    y_distance = 0.0
-    num_points = 0.0
+def get_objective_function(d, means):
+    '''
+    1) Get a distance as a radius
+    2) Plot objective function on y-axis with iterations on x-axis
+    '''
+
+    sse = 0.0
 
     for r in d:
-        # Get the closest average point
-        closest_mean = get_closest_mean(r, means)
+        # Error at point squared = ||xn - uk||^2
+        sse += math.pow(get_distance([float(r[2]), float(r[3])], get_closest_mean([float(r[2]), float(r[3])], means)), 2)
 
-        # If the closest average point is the average point
-        if np.array_equal(mean, closest_mean):
-            num_points += 1.0
-            x_distance += pow(abs(float(r[2]) - mean[0]), 2)
-            y_distance += pow(abs(float(r[3]) - mean[1]), 2)
-
-    return [x_distance / num_points, y_distance / num_points]
+    return sse
 
 
 def get_closest_mean(r, means):
@@ -101,7 +118,6 @@ def get_closest_mean(r, means):
 
     for mean in means:
         # Get distance between the current point and the mean
-        # TODO: might need to change from [0, 1] back to [2, 3]
         d = get_distance([float(r[0]), float(r[1])], mean)
 
         # If current average is closer to the point than the prior average, make the prior average the current average
@@ -130,37 +146,15 @@ with open('CSDS391_P2\irisdata.csv') as file:
         # Add the iris data to the data 2D array
         data.append(row)
 
-    # plot data
-    # plot_data(data)
-
     # k-means clustering
     k = [1, 2, 3, 4]
-    # t = np.linspace(0, 2 * pi, 200)
 
     # uk = k_means_cluster(2, data)
 
     for num_clusters in k:
         uk = k_means_cluster(num_clusters, data)
 
-    '''
-    for numMeans in k:
-        # Plot data points
-        plot_data(data)
 
-        # Get averages
-        uk = k_means_cluster(numMeans, data)
-
-        # For each mean, plot the mean and the objective function
-        for point in uk:
-            # Plot averages:
-            plt.plot(point[0], point[1], linestyle='none', marker='o', color='black')
-
-            # Plot Objective Function:
-            # = get_objective_function(data, point, uk)
-            #plt.plot(point[0] + D[0] * np.cos(t), point[1] + D[1] * np.sin(t), '-', color='gray')
-
-        plt.show()
-    '''
 
     '''
     Plot decision boundaries
