@@ -30,21 +30,6 @@ def plot_data(d):
 
 
 def k_means_cluster(k, d):
-    '''
-    uki = Sum(n, rnk * xni) / Sum(n, rnk)
-    xn = nth data vector
-    rnk is 1 if xn is in the kth class, otherwise 0
-
-    Algorithm:
-    1) Initialize k points as means
-    2) Categorize each data point to its closest mean and update the mean's coordinates
-    (which are the averages of the number of items categorized in that cluster so far)
-    3) repeat the process for a given number of iterations and at the end we have our clusters
-    '''
-
-    # Plot the data
-    plot_data(d)
-
     # Initialize k different random points to be the initial means
     averages = k * [[0.0, 0.0]]
     for index in range(k):
@@ -53,118 +38,42 @@ def k_means_cluster(k, d):
             random_point = random.randint(0, 150)
             if not averages.__contains__([float(d[random_point][2]), float(d[random_point][3])]):
                 break
-        # Set the average cluster in the averages array and plot the point
+        # Set the average cluster in the averages array
         averages[index] = [float(d[random_point][2]), float(d[random_point][3])]
-        plt.plot(averages[index][0], averages[index][1], linestyle='none', marker='o', color='black')
-
-    plt.show()
 
     while True:
+        # Plot the data and the averages
+        plot_data(d)
+        for average in averages:
+            plt.plot(average[0], average[1], color='black', marker='o', linestyle='none')
+        plt.show()
+
         # Make sure that each iteration is changing the averages
         last_averages = averages.copy()
 
         # Categorize each data point to its closest mean
-        points = k * [[]]
-
+        averages = [[0.0, 0.0] for i in range(k)]
+        num_points = k * [0.0]
         for r in d:
-            point = [float(r[2]), float(r[3])]
-            # Get the average point that is closest to the current point
-            closest_average = get_closest_mean(point, averages)
-            print(str(point) + ' ' + str(closest_average) + ' ' + str(averages))
+            # Classify what average the point is closest to
+            index = last_averages.index(get_closest_mean([r[2], r[3]], last_averages))
 
-            print(averages.index(closest_average))
-            points[averages.index(closest_average)].append(point)
+            # Increase how many points are assigned to a specific average
+            num_points[index] += 1.0
 
-        # Update each mean's coordinates
+            # Add the x and y positions to the average
+            averages[index][0] += float(r[2])
+            averages[index][1] += float(r[3])
+
+        # Make the sums an average by dividing by the number of points that are closest to a specific average
         for index in range(k):
-            x_average = 0.0
-            y_average = 0.0
-            print('Length: ' + str(len(points[index])) + '\tIndex: ' + str(index))
-            for point in points[index]:
-                x_average += point[0]
-                y_average += point[1]
+            averages[index][0] /= num_points[index]
+            averages[index][1] /= num_points[index]
 
-            averages[index] = [x_average/float(len(points[index])), y_average/float(len(points[index]))]
-            print(averages[index])
-
-        # Plot the data
-        plot_data(d)
-
-        # Plot the averages
-        for average in averages:
-            plt.plot(average[0], average[1], linestyle='none', marker='o', color='black')
-
-        plt.show()
-
+        # If the cluster points did not shift locations, return the clusters
         if last_averages == averages:
             return averages
 
-    '''
-    means = []
-    points = []
-
-    # Initialize the first means of the data set
-    for i in range(k):
-        means.append([float(d[int(i * len(d) / k)][2]), float(d[int(i * len(d) / k)][3])])
-        points.append([])
-
-    count = 0
-
-    # Repeat updating the mean
-    while True:
-        print(count)
-        count += 1
-        last_means = means.copy()
-
-        # Empty points
-        points = []
-        for i in range(k):
-            points.append([])
-
-        # Categorize each data point to its closest mean and update that mean's coordinates
-        for r in range(len(d)):
-            # get the data point
-            pt = [float(d[k][2]), float(d[r][3])]
-
-            ''
-            # find the mean closest to it
-            distance = get_distance(pt, means[0])
-            mean = 0
-
-            # check for closer distances
-            for i in range(k):
-                temp_distance = get_distance(pt, means[i])
-                if temp_distance < distance:
-                    mean = i
-                    distance = temp_distance
-            ''
-            mean = get_closest_mean(pt, means)
-            index = -1
-
-            for i in range(len(means)):
-                if mean == means[i]:
-                    index = i
-                    break
-
-            # categorize the point to a mean
-            points[index].append(pt)
-
-        # Update mean by shifting it to the average for each item in the cluster
-        for i in range(k):
-            average_x = 0.0
-            average_y = 0.0
-
-            for j in points[i]:
-                average_x += j[0]
-                average_y += j[1]
-            if len(points[i]) != 0:
-                means[i] = [average_x / len(points[i]), average_y / len(points[i])]
-
-        if means == last_means:
-            return means
-    '''
-
-    return averages
 
 def get_objective_function(d, mean, means):
     # Returns the objective function
@@ -225,13 +134,13 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # plot_data(data)
 
     # k-means clustering
-    # k = [1, 2, 3, 4]
+    k = [1, 2, 3, 4]
     # t = np.linspace(0, 2 * pi, 200)
 
-    uk = k_means_cluster(2, data)
+    # uk = k_means_cluster(2, data)
 
-    # for num_clusters in k:
-        # uk = k_means_cluster(num_clusters, data)
+    for num_clusters in k:
+        uk = k_means_cluster(num_clusters, data)
 
     '''
     for numMeans in k:
