@@ -65,7 +65,6 @@ def k_means_cluster(k, d):
 
         # Show the graph
         plt.title('k-means clustering for ' + str(k) + ' Clusters\nIteration: ' + str(iterations))
-        # TODO: Uncomment
         plt.show()
 
         # Make sure that each iteration is changing the averages
