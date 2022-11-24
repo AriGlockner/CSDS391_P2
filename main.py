@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import csv
 
 from numpy import pi
@@ -57,7 +58,7 @@ def k_means_cluster(k, d):
         # Show the graph
         plt.title('k-means clustering for ' + str(k) + ' Clusters')
         # TODO: Uncomment
-        # plt.show()
+        plt.show()
 
         # Make sure that each iteration is changing the averages
         last_averages = averages.copy()
@@ -131,16 +132,23 @@ def get_decision_bounds(point1, point2):
 
 
 def get_likelihood(point, cluster, clusters):
-
+    # distance_test is 1 / the distance from the point to the cluster
     distance_test = 1.0 / get_distance(point, cluster)
+
+    # distance_all is 1 / the sum of the distance from the point to each cluster
     distance_all = 0.0
     for c in clusters:
         distance_all += 1.0 / get_distance(point, c)
 
+    # return the percentage likelihood of it being a specific cluster at a specific point
     return distance_test / distance_all
 
 
 def plot_decision_boundaries(num_clusters):
+    uk = []
+    d = []
+
+    # Get clusters
     output = k_means_cluster(num_clusters, data)
     uk.append(output[0])
     d.append(output[1])
@@ -156,27 +164,29 @@ def plot_decision_boundaries(num_clusters):
             x = (p1[0] + p2[0]) / 2.0
             y = (p1[1] + p2[1]) / 2.0
 
-            # point
-            # plt.plot(x, y, 'co', linestyle='none', linewidth=0.5)
-
             # line
             t = np.linspace(0.0, 7.0, 200)
             m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
             line = y - (t - x) / m
 
-            # TODO: Use likelihood function to determine if it should graph or not
-            print('(' + str(x) + ', ' + str(y) + ')')
-            plt.plot(x, y, 'co', linestyle='none')
+            # Determine if the line should be plotted
             l1 = get_likelihood([x, y], p1, uk[0])
-            l2 = get_likelihood([x, y], p2, uk[0])
-            l3 = 1.0 - l1 - l2
-            print('L1:\t' + str(l1))
-            print('L2:\t' + str(l2))
-            print('L3:\t' + str(l3))
-
+            l3 = 1.0 - (2.0 * l1)
             if l3 < l1:
-                plt.plot(t, line, 'c--')
+                plt.plot(t, line, 'c:')
 
+    # Make plot fancier and show the plot
+    names = ['Setosa', 'Versicolor', 'virginica', 'Cluster', 'Decision Boundaries']
+    colors = ['b', 'r', 'g', 'k', 'c']
+    hands = []
+
+    for i in range(5):
+        hands.append(mpatches.Patch(color=colors[i], label=names[i]))
+
+    plt.legend(handles=hands, loc='upper left')
+
+    plt.xlim(0.0, 7.1)
+    plt.ylim(0.0, 2.6)
     plt.show()
 
     pass
@@ -231,11 +241,8 @@ with open('CSDS391_P2\irisdata.csv') as file:
         data.append(row)
 
     # k-means clustering
-    k = [3]
 
     # uk = k_means_cluster(2, data)
-    uk = []
-    d = []
 
     plot_decision_boundaries(2)
     plot_decision_boundaries(3)
@@ -279,7 +286,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
         plt.show()
         '''
-    
+
     '''
     Plot decision boundaries for dataset using 
     '''
