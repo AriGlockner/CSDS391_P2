@@ -8,6 +8,10 @@ import csv
 
 from numpy import pi
 
+'''
+Clustering Methods
+'''
+
 
 def plot_data(d):
     for r in d:
@@ -46,7 +50,11 @@ def k_means_cluster(k, d):
     # Objective Function
     objective_function = []
 
+    # Number of iterations
+    iterations = 0
+
     while True:
+        iterations += 1
         # Plot the data and the averages
         plot_data(d)
         for average in averages:
@@ -56,7 +64,7 @@ def k_means_cluster(k, d):
         objective_function.append(get_objective_function(d, averages))
 
         # Show the graph
-        plt.title('k-means clustering for ' + str(k) + ' Clusters')
+        plt.title('k-means clustering for ' + str(k) + ' Clusters\nIteration: ' + str(iterations))
         # TODO: Uncomment
         plt.show()
 
@@ -187,21 +195,10 @@ def plot_decision_boundaries(num_clusters):
 
     plt.xlim(0.0, 7.1)
     plt.ylim(0.0, 2.6)
+    plt.title('Decision Boundaries for ' + str(num_clusters) + ' Clusters')
     plt.show()
 
     pass
-
-
-def mse(d, means):
-
-    return get_objective_function(d, means) / 150.0
-
-'''
-3a)
-average of the square of the distances between the centroid and the points over the entire population
-
-Objective function divided by n
-'''
 
 
 def get_closest_mean(r, means):
@@ -227,6 +224,25 @@ def get_distance(pa, pb):
     return math.sqrt(math.pow(pa[0] - pb[0], 2) + math.pow(pa[1] - pb[1], 2))
 
 
+'''
+Linear Decision Boundaries Methods
+'''
+
+
+def plot_v_data(d):
+    # Start after all of the setosa's and plot the versicolors and virginicas
+    r = 50
+    while r < 150:
+        # Plot if versicolor
+        if d[r][4] == 'versicolor':
+            plt.plot(float(d[r][2]), float(d[r][3]), linestyle='none', marker='o', color='g')
+        # Plot if virginica
+        else:
+            plt.plot(float(d[r][2]), float(d[r][3]), linestyle='none', marker='o', color='b')
+        r += 1
+    pass
+
+
 with open('CSDS391_P2\irisdata.csv') as file:
     # Used to take out the header from the file
     heading = next(file)
@@ -240,70 +256,13 @@ with open('CSDS391_P2\irisdata.csv') as file:
         # Add the iris data to the data 2D array
         data.append(row)
 
-    # k-means clustering
+    # TODO: Uncomment
+    # Exercise 1: Clustering
+    # plot_decision_boundaries(2)
+    # plot_decision_boundaries(3)
 
-    # uk = k_means_cluster(2, data)
+    # TODO: Write
+    # Exercise 2: Linear Decision Boundaries
+    plot_v_data(data)
+    plt.show()
 
-    plot_decision_boundaries(2)
-    plot_decision_boundaries(3)
-
-    '''
-        output = k_means_cluster(num_clusters, data)
-        uk.append(output[0])
-        d.append(output[1])
-        plot_data(data)
-
-        for index in range(len(uk[0])):
-            p1 = [uk[0][index][0], uk[0][index][1]]
-            plt.plot(p1[0], p1[1], 'ko', linestyle='none')
-
-            for index2 in range((index+1), len(uk[0])):
-                p2 = uk[0][index2][0], uk[0][index2][1]
-
-                x = (p1[0] + p2[0]) / 2.0
-                y = (p1[1] + p2[1]) / 2.0
-
-                # point
-                # plt.plot(x, y, 'co', linestyle='none', linewidth=0.5)
-
-                # line
-                t = np.linspace(0.0, 7.0, 200)
-                m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
-                line = y-(t-x)/m
-
-                # TODO: Use likelihood function to determine if it should graph or not
-                print('(' + str(x) + ', ' + str(y) + ')')
-                plt.plot(x, y, 'co', linestyle='none')
-                l1 = get_likelihood([x, y], p1, uk[0])
-                l2 = get_likelihood([x, y], p2, uk[0])
-                l3 = 1.0 - l1 - l2
-                print('L1:\t' + str(l1))
-                print('L2:\t' + str(l2))
-                print('L3:\t' + str(l3))
-
-                if l3 < l1:
-                    plt.plot(t, line, 'c--')
-
-        plt.show()
-        '''
-
-    '''
-    Plot decision boundaries for dataset using 
-    '''
-
-    '''
-    Plot decision boundaries
-    Possible ideas:
-    1. Take averages between points and use that to get lines (vernoi diagram)
-    2. Use likelihood function
-    3. k neighbors/centroids
-    Go back and reread the lecture slides for another idea
-    '''
-
-    '''
-    Exercise 2B:
-    just do an equation to approximate linear bound
-    '''
-
-    # Show the plot
-    # plt.show()
