@@ -112,7 +112,7 @@ def get_objective_function(d, means):
 
 def get_decision_bounds(point1, point2):
     '''
-    If y - a = m(x - b) will give the line containing both points 1 and 2, then y = b - (x - a)/m will be the line
+    If y - a = m(x - b) will give the line containing both points 1 and 2, then y = `b - (x - a)/m` will be the line
     containing the midpoint between a and b and be perpendicular to the line containing a and b
 
     :param point1:
@@ -128,6 +128,58 @@ def get_decision_bounds(point1, point2):
     # Slope of the line (if y = mx + b for the line )
     slope = abs(point2[0] - point1[0]) / abs(point2[1] - point1[1])
     return y_constant - (x_axis - x_constant) / slope
+
+
+def get_likelihood(point, cluster, clusters):
+
+    distance_test = 1.0 / get_distance(point, cluster)
+    distance_all = 0.0
+    for c in clusters:
+        distance_all += 1.0 / get_distance(point, c)
+
+    return distance_test / distance_all
+
+
+def plot_decision_boundaries(num_clusters):
+    output = k_means_cluster(num_clusters, data)
+    uk.append(output[0])
+    d.append(output[1])
+    plot_data(data)
+
+    for index in range(len(uk[0])):
+        p1 = [uk[0][index][0], uk[0][index][1]]
+        plt.plot(p1[0], p1[1], 'ko', linestyle='none')
+
+        for index2 in range((index + 1), len(uk[0])):
+            p2 = uk[0][index2][0], uk[0][index2][1]
+
+            x = (p1[0] + p2[0]) / 2.0
+            y = (p1[1] + p2[1]) / 2.0
+
+            # point
+            # plt.plot(x, y, 'co', linestyle='none', linewidth=0.5)
+
+            # line
+            t = np.linspace(0.0, 7.0, 200)
+            m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
+            line = y - (t - x) / m
+
+            # TODO: Use likelihood function to determine if it should graph or not
+            print('(' + str(x) + ', ' + str(y) + ')')
+            plt.plot(x, y, 'co', linestyle='none')
+            l1 = get_likelihood([x, y], p1, uk[0])
+            l2 = get_likelihood([x, y], p2, uk[0])
+            l3 = 1.0 - l1 - l2
+            print('L1:\t' + str(l1))
+            print('L2:\t' + str(l2))
+            print('L3:\t' + str(l3))
+
+            if l3 < l1:
+                plt.plot(t, line, 'c--')
+
+    plt.show()
+
+    pass
 
 
 def mse(d, means):
@@ -161,7 +213,8 @@ def get_closest_mean(r, means):
 
 def get_distance(pa, pb):
     # returns the distance between 2 points
-    return abs(pa[0] - pb[0]) + abs(pa[1] - pb[1])
+    # return abs(pa[0] - pb[0]) + abs(pa[1] - pb[1])
+    return math.sqrt(math.pow(pa[0] - pb[0], 2) + math.pow(pa[1] - pb[1], 2))
 
 
 with open('CSDS391_P2\irisdata.csv') as file:
@@ -184,32 +237,14 @@ with open('CSDS391_P2\irisdata.csv') as file:
     uk = []
     d = []
 
-    for num_clusters in k:
+    plot_decision_boundaries(2)
+    plot_decision_boundaries(3)
+
+    '''
         output = k_means_cluster(num_clusters, data)
         uk.append(output[0])
         d.append(output[1])
-
-        print(uk)
-        print(d)
-
         plot_data(data)
-
-        '''
-        for index in range(len(uk)):
-            plt.plot(uk[index][1], uk[index][0], 'ko', linestyle='none')
-
-            avg = [0.0, 0.0]
-
-            for index2 in range(index + 1, len(uk)):
-                print(str(index) + ' ' + str(index2))
-                print(index == index2)
-                print(uk[index] == uk[index2])
-
-        plt.show()
-        '''
-        print()
-        print(len(uk[0]))
-        print()
 
         for index in range(len(uk[0])):
             p1 = [uk[0][index][0], uk[0][index][1]]
@@ -228,10 +263,23 @@ with open('CSDS391_P2\irisdata.csv') as file:
                 t = np.linspace(0.0, 7.0, 200)
                 m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
                 line = y-(t-x)/m
+
                 # TODO: Use likelihood function to determine if it should graph or not
-                plt.plot(t, line, 'c-')
+                print('(' + str(x) + ', ' + str(y) + ')')
+                plt.plot(x, y, 'co', linestyle='none')
+                l1 = get_likelihood([x, y], p1, uk[0])
+                l2 = get_likelihood([x, y], p2, uk[0])
+                l3 = 1.0 - l1 - l2
+                print('L1:\t' + str(l1))
+                print('L2:\t' + str(l2))
+                print('L3:\t' + str(l3))
+
+                if l3 < l1:
+                    plt.plot(t, line, 'c--')
 
         plt.show()
+        '''
+    
     '''
     Plot decision boundaries for dataset using 
     '''
