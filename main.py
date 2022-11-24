@@ -266,18 +266,15 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # plot_decision_boundaries(2, data)
     # plot_decision_boundaries(3, data)
 
+    # Exercise 2: Linear Decision Boundaries
     # Get data for just the 2nd and 3rd iris classes
     v_data = []
     start = 50
     while start < 150:
         v_data.append(data[start])
         start += 1
-
-    # Exercise 2: Linear Decision Boundaries
     # TODO: Uncomment
     # plot_data(v_data)
-
-    # TODO: Write
     plot_decision_boundaries(2, v_data)
     plt.show()
 
