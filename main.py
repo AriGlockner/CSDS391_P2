@@ -18,11 +18,11 @@ def plot_data(d):
         # Get the color based on the species
         c = 'black'
         if r[4] == 'setosa':
-            c = 'blue'
-        elif r[4] == 'versicolor':
             c = 'red'
-        elif r[4] == 'virginica':
+        elif r[4] == 'versicolor':
             c = 'green'
+        elif r[4] == 'virginica':
+            c = 'blue'
         else:
             c = 'black'
 
@@ -36,12 +36,14 @@ def plot_data(d):
 
 
 def k_means_cluster(k, d):
+    print(len(d))
     # Initialize k different random points to be the initial means
     averages = k * [[0.0, 0.0]]
     for index in range(k):
         # Makes sure that two initial means cannot be the same starting point
         while True:
-            random_point = random.randint(0, 150)
+            random_point = random.randint(0, len(d))
+            print(random_point)
             if not averages.__contains__([float(d[random_point][2]), float(d[random_point][3])]):
                 break
         # Set the average cluster in the averages array
@@ -55,17 +57,19 @@ def k_means_cluster(k, d):
 
     while True:
         iterations += 1
-        # Plot the data and the averages
-        plot_data(d)
-        for average in averages:
-            plt.plot(average[0], average[1], color='black', marker='o', linestyle='none')
 
-        # Get a data point for the Objective Function
-        objective_function.append(get_objective_function(d, averages))
+        if len(d) == 150:
+            # Plot the data and the averages
+            plot_data(d)
+            for average in averages:
+                plt.plot(average[0], average[1], color='black', marker='o', linestyle='none')
 
-        # Show the graph
-        plt.title('k-means clustering for ' + str(k) + ' Clusters\nIteration: ' + str(iterations))
-        plt.show()
+            # Get a data point for the Objective Function
+            objective_function.append(get_objective_function(d, averages))
+
+            # Show the graph
+            plt.title('k-means clustering for ' + str(k) + ' Clusters\nIteration: ' + str(iterations))
+            plt.show()
 
         # Make sure that each iteration is changing the averages
         last_averages = averages.copy()
@@ -91,16 +95,19 @@ def k_means_cluster(k, d):
 
         # If the cluster points did not shift locations, return the clusters
         if last_averages == averages:
-            # Plot Objective Function
-            plt.plot(range(len(objective_function)), objective_function, 'ko')
-            plt.plot(range(len(objective_function)), objective_function, 'k')
-            plt.xlabel('Iteration')
-            plt.ylabel('Sum of Error Squared')
-            plt.title('Objective Function for ' + str(k) + ' Clusters')
-            plt.show()
+            if len(d) == 150:
+                # Plot Objective Function
+                plt.plot(range(len(objective_function)), objective_function, 'ko')
+                plt.plot(range(len(objective_function)), objective_function, 'k')
+                plt.xlabel('Iteration')
+                plt.ylabel('Sum of Error Squared')
+                plt.title('Objective Function for ' + str(k) + ' Clusters')
+                plt.show()
 
-            # Return the centroids of the clusters
-            return [averages, objective_function]
+                # Return the centroids of the clusters
+                return [averages, objective_function]
+            else:
+                return [averages, 0]
 
 
 def get_objective_function(d, means):
@@ -151,15 +158,15 @@ def get_likelihood(point, cluster, clusters):
     return distance_test / distance_all
 
 
-def plot_decision_boundaries(num_clusters):
+def plot_decision_boundaries(num_clusters, iris_data):
     uk = []
     d = []
 
     # Get clusters
-    output = k_means_cluster(num_clusters, data)
+    output = k_means_cluster(num_clusters, iris_data)
     uk.append(output[0])
     d.append(output[1])
-    plot_data(data)
+    plot_data(iris_data)
 
     for index in range(len(uk[0])):
         p1 = [uk[0][index][0], uk[0][index][1]]
@@ -184,7 +191,7 @@ def plot_decision_boundaries(num_clusters):
 
     # Make plot fancier and show the plot
     names = ['Setosa', 'Versicolor', 'virginica', 'Cluster', 'Decision Boundaries']
-    colors = ['b', 'r', 'g', 'k', 'c']
+    colors = ['r', 'g', 'b', 'k', 'c']
     hands = []
 
     for i in range(5):
@@ -192,8 +199,13 @@ def plot_decision_boundaries(num_clusters):
 
     plt.legend(handles=hands, loc='upper left')
 
-    plt.xlim(0.0, 7.1)
-    plt.ylim(0.0, 2.6)
+    if len(iris_data) == 150:
+        plt.xlim(0.0, 7.1)
+        plt.ylim(0.0, 2.6)
+    else:
+        plt.xlim(2.9, 7.1)
+        plt.ylim(0.9, 2.6)
+
     plt.title('Decision Boundaries for ' + str(num_clusters) + ' Clusters')
     plt.show()
 
@@ -228,18 +240,12 @@ Linear Decision Boundaries Methods
 '''
 
 
-def plot_v_data(d):
-    # Start after all of the setosa's and plot the versicolors and virginicas
-    r = 50
-    while r < 150:
-        # Plot if versicolor
-        if d[r][4] == 'versicolor':
-            plt.plot(float(d[r][2]), float(d[r][3]), linestyle='none', marker='o', color='g')
-        # Plot if virginica
-        else:
-            plt.plot(float(d[r][2]), float(d[r][3]), linestyle='none', marker='o', color='b')
-        r += 1
-    pass
+def get_decision_boundary(cluster_a, cluster_b, t):
+    x = (cluster_a[0] + cluster_b[0]) / 2.0
+    y = (cluster_a[1] + cluster_b[1]) / 2.0
+    m = abs(cluster_a[0] - cluster_b[0]) / abs(cluster_a[1] - cluster_b[1])
+
+    return y - (t - x) / m
 
 
 with open('CSDS391_P2\irisdata.csv') as file:
@@ -257,11 +263,21 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
     # TODO: Uncomment
     # Exercise 1: Clustering
-    # plot_decision_boundaries(2)
-    # plot_decision_boundaries(3)
+    # plot_decision_boundaries(2, data)
+    # plot_decision_boundaries(3, data)
+
+    # Get data for just the 2nd and 3rd iris classes
+    v_data = []
+    start = 50
+    while start < 150:
+        v_data.append(data[start])
+        start += 1
+
+    # Exercise 2: Linear Decision Boundaries
+    # TODO: Uncomment
+    # plot_data(v_data)
 
     # TODO: Write
-    # Exercise 2: Linear Decision Boundaries
-    plot_v_data(data)
+    plot_decision_boundaries(2, v_data)
     plt.show()
 
