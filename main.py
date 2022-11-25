@@ -36,14 +36,12 @@ def plot_data(d):
 
 
 def k_means_cluster(k, d):
-    print(len(d))
     # Initialize k different random points to be the initial means
     averages = k * [[0.0, 0.0]]
     for index in range(k):
         # Makes sure that two initial means cannot be the same starting point
         while True:
             random_point = random.randint(0, len(d))
-            print(random_point)
             if not averages.__contains__([float(d[random_point][2]), float(d[random_point][3])]):
                 break
         # Set the average cluster in the averages array
@@ -125,7 +123,7 @@ def get_objective_function(d, means):
     return sse
 
 
-def get_decision_bounds(point1, point2):
+def get_decision_bounds(point1, point2, t):
     '''
     If y - a = m(x - b) will give the line containing both points 1 and 2, then y = `b - (x - a)/m` will be the line
     containing the midpoint between a and b and be perpendicular to the line containing a and b
@@ -138,11 +136,9 @@ def get_decision_bounds(point1, point2):
     x_constant = (point1[0] + point2[0]) / 2.0
     y_constant = (point1[1] + point2[1]) / 2.0
 
-    # line
-    x_axis = np.linspace(0.0, 7.0, 200)
     # Slope of the line (if y = mx + b for the line )
     slope = abs(point2[0] - point1[0]) / abs(point2[1] - point1[1])
-    return y_constant - (x_axis - x_constant) / slope
+    return y_constant - (t - x_constant) / slope
 
 
 def get_likelihood(point, cluster, clusters):
@@ -158,7 +154,7 @@ def get_likelihood(point, cluster, clusters):
     return distance_test / distance_all
 
 
-def plot_decision_boundaries(num_clusters, iris_data):
+def plot_decision_boundaries(num_clusters, iris_data, t):
     uk = []
     d = []
 
@@ -179,7 +175,6 @@ def plot_decision_boundaries(num_clusters, iris_data):
             y = (p1[1] + p2[1]) / 2.0
 
             # line
-            t = np.linspace(0.0, 7.0, 200)
             m = abs(p2[0] - p1[0]) / abs(p2[1] - p1[1])
             line = y - (t - x) / m
 
@@ -240,12 +235,32 @@ Linear Decision Boundaries Methods
 '''
 
 
-def get_decision_boundary(cluster_a, cluster_b, t):
-    x = (cluster_a[0] + cluster_b[0]) / 2.0
-    y = (cluster_a[1] + cluster_b[1]) / 2.0
-    m = abs(cluster_a[0] - cluster_b[0]) / abs(cluster_a[1] - cluster_b[1])
+def compute_linear_classification(d, point):
+    """
+    :param d: dataset
+    :param point: the point to get calculate the percent likelihood of being verginica
+    :return: a number between 0 and 1
+    """
+    clusters = k_means_cluster(2, d)
 
-    return y - (t - x) / m
+    # Distinguish which cluster is which flower
+    if clusters[0][0] < clusters[0][1]:
+        cluster0 = clusters[0][0]
+        cluster1 = clusters[0][1]
+    else:
+        cluster0 = clusters[0][1]
+        cluster1 = clusters[0][0]
+
+    # Get the distance to each cluster
+    d0 = get_distance(point, cluster0)
+    d1 = get_distance(point, cluster1)
+
+    # Calculate the classification function
+    if d0 < d1:
+        z = (d0 - d1) / d0
+    else:
+        z = (d0 - d1) / d1
+    return 1.0 / (1.0 + math.pow(math.e, -z))
 
 
 with open('CSDS391_P2\irisdata.csv') as file:
@@ -260,11 +275,12 @@ with open('CSDS391_P2\irisdata.csv') as file:
     for row in iris:
         # Add the iris data to the data 2D array
         data.append(row)
+    t = np.linspace(0.0, 7.0, 200)
 
     # TODO: Uncomment
     # Exercise 1: Clustering
-    # plot_decision_boundaries(2, data)
-    # plot_decision_boundaries(3, data)
+    # plot_decision_boundaries(2, data, t)
+    # plot_decision_boundaries(3, data, t)
 
     # Exercise 2: Linear Decision Boundaries
     # Get data for just the 2nd and 3rd iris classes
@@ -274,7 +290,11 @@ with open('CSDS391_P2\irisdata.csv') as file:
         v_data.append(data[start])
         start += 1
     # TODO: Uncomment
-    # plot_data(v_data)
-    plot_decision_boundaries(2, v_data)
+    plot_data(v_data)
+    pts = [[4.3, 1.4], [5.0, 1.8], [5.6, 2.05]]
+    for pt in pts:
+        print(pt)
+        plt.plot(pt[0], pt[1], 'co')
+        print(compute_linear_classification(v_data, pt))
     plt.show()
 
