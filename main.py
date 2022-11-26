@@ -395,34 +395,114 @@ def show_simple_classifier(d, m, b, k):
 '''
 Neural Networks Methods
 '''
-
-
-def mse(d, m, b):
-    # E = 1/2 * sum of n for (yn(xn, W1:L) - tn)^2
-    E = 0.0
-    for r in d:
-        if r[4] == 'versicolor':
-            E += math.pow(1 - signoid(m * float(r[2]) - float(r[3]) + b), 2)
-        else:
-            E += math.pow(signoid(m * float(r[2]) - float(r[3]) + b), 2)
-
-    return E / 2.0
-
-
-def exc3b(d, m1, b1, m2, b2):
+def plot_data_and_line(d, w0, w1, w2, color='c'):
+    '''
     plot_data(d)
 
-    t = np.linspace(3.0, 7.0, 200)
+    # z = w0 + w1 * x1 + w2 * x2 = 0
+    # x2 = -(w0 - w1 * x1)/w2
+    plt.plot(time_scale, -(w0 - w1 * time_scale)/w2, line_settings)
+    '''
 
-    plt.plot(t, m1 * t + b1, 'c-')
-    plt.plot(t, m2 * t + b2, 'y-')
-    print(mse(d, m1, b1))
-    print(mse(d, m2, b2))
+    plot_data(d)
+    plt.axline(xy1=(0, -w0 / w2), xy2=(-w0 / w1, 0), color=color)
+
+    plt.xlim(2.9, 7.1)
+    plt.ylim(0.9, 2.6)
 
     pass
 
 
-def exc3c():
+def get_point_actual(flower):
+    if flower == 'versicolor':
+        return 0.0
+    else:
+        return 1.0
+
+
+def mse(d, w0, w1, w2):
+    plot_data_and_line(d, w0, w1, w2)
+
+    # z = w0 + w1 * x1 + w2 * x2
+
+    # E = 1/2 * sum of n for (yn(xn, W1:L) - tn)^2
+    E = 0.0
+    for r in d:
+        x1 = float(r[2])
+        x2 = float(r[3])
+
+        z = w0 + w1 * x1 + w2 * x2
+        sigma = signoid(z)
+
+        v = get_point_actual(r[4])
+
+        # print(v, sigma)
+
+        E += math.pow(v - sigma, 2)
+
+    return E / len(d)
+
+
+def exc3b(d, w00, w10, w20, w01, w11, w21):
+    plot_data_and_line(d, w00, w10, w20)
+    mse0 = mse(d, w00, w10, w20)
+    plot_data_and_line(d, w01, w11, w21, 'r')
+    mse1 = mse(d, w01, w11, w21)
+    plt.show()
+    return [mse0, mse1]
+
+
+def exc3e(d, w0, w1, w2):
+    '''
+    f(z) = 1/(1 + e-z)
+    f'(z) = (e-z)/(1 + e-z)2
+    z = mx - y + b
+
+    f'(x) = m(e(y - mx - b))/(1 + e(y - mx - b))2
+    f'(y) = -(e(y - mx - b))/(1 + e(y - mx - b))2
+    '''
+
+    plot_data_and_line(d, w0, w1, w2)
+
+    grad_w0 = 0.0
+    grad_w1 = 0.0
+    grad_w2 = 0.0
+
+    for r in d:
+        # Get the point
+        x1 = float(r[2])
+        x2 = float(r[3])
+
+        z = w0 + w1 * x1 + w2 * x2
+
+        v = get_point_actual(r[4])
+
+        # Calculate Sigma
+        sigma = signoid(z)
+        # print(v, sigma)
+
+        # Calculate the derivatives of the sigmas
+        d_sigma = math.exp(-z)/math.pow((1 + math.exp(-z)), 2)
+
+        # Calculate the gradient of z
+        df_dz = 2.0 * (v - sigma) * -d_sigma
+
+        # Sum up the gradient at each point
+        grad_w0 += df_dz * 1
+        grad_w1 += df_dz * x1
+        grad_w2 += df_dz * x2
+
+    # Divide by the number of data points
+    grad_w0 /= -len(d)
+    grad_w1 /= -len(d)
+    grad_w2 /= -len(d)
+    # print([grad_w0, grad_w1, grad_w2])
+
+    #
+    step_size = 10.0
+    plot_data_and_line(d, w0 + grad_w0 * step_size, w1 + grad_w1 * step_size, w2 + grad_w2 * step_size, 'r')
+
+    plt.show()
 
     pass
 
@@ -451,7 +531,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # Exercises: 1a, 1b, 1c, and 1d for k = 3
     plot_decision_boundaries(3, data, t)
     '''
-    
+
     '''
     Linear Decision Boundaries
     '''
@@ -487,15 +567,31 @@ with open('CSDS391_P2\irisdata.csv') as file:
     '''
     Neural Networks
     '''
+    # TODO: Change from m, b to w0, w1, w2
 
     # print(mse(v_data, -0.6, 4.8))
-
     # ex2c(v_data, -0.5, 4.1)
     # Exercise 3a
-    # print(mse(v_data, -0.5, 4.1))
+    # print(mse(v_data, -45, 6, 10))
+    # print(mse(v_data, -44, 7, 11))
 
     # Exercise 3b
-    # exc3b(v_data, -0.6, 4.8, -0.3, 3.3)
+    # print(exc3b(v_data, -45, 6, 10, -30, 1, 15))
+
+    '''
+    3c)
+    
+    3d)
+    
+    '''
+
+    # Exercise 3e
+    exc3e(v_data, -45, 6, 10)
+    exc3e(v_data, -44, 7, 11)
+
+    '''
+    Learning a Decision Boundary Through Optimization
+    '''
 
     plt.show()
 
