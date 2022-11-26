@@ -527,6 +527,8 @@ def exc4a(d, w0, w1, w2):
 
         count += 1
 
+        print(count, norm)
+
         if norm < threshold:
             return [w0, w1, w2]
 
@@ -537,7 +539,25 @@ def exc4b(d, w0, w1, w2):
     line = exc4a(d, w0, w1, w2)
     plot_data_and_line(d, line[0], line[1], line[2], 'r')
 
+    return line
+
+
+def exc4c(d):
+    np.random.seed(1234)
+    w = np.random.uniform(-5, 5, 3)
+    print(w)
+    output = exc4b(d, w[0], w[1], w[2])
+    print(output)
+
+    '''
+    3d)
+    Trial and error
+    3e)
+    norm of the gradient was close to 0    
+    '''
+
     pass
+
 
 with open('CSDS391_P2\irisdata.csv') as file:
     # Used to take out the header from the file
@@ -629,7 +649,18 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # print(exc4a(v_data, -44, 7, 11))
 
     # Exercise 4b
-    exc4b(v_data, -44, 7, 11)
+    # exc4b(v_data, -44, 7, 11)
+
+    # Exercise 4c
+    exc4c(v_data)
+
+    '''
+    3d)
+    Trial and error
+    
+    3e)
+    norm of the gradient was close to 0    
+    '''
 
     plt.show()
 
