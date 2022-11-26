@@ -323,7 +323,7 @@ def compute_linear_classification(point, c0, c1, d):
     return 0.0
 
 
-def ex2c(d, m, b):
+def plot_neural_network_decision_boundary(d, m, b):
     # timescale
     timescale = np.linspace(3.0, 7.0, 200)
 
@@ -365,7 +365,7 @@ def ex2c(d, m, b):
     return 0.0
 
 
-def ex2d(d, m, b):
+def plot_neural_network(d, m, b):
     ax = plt.axes(projection='3d')
     for v in d:
         x = float(v[2])
@@ -378,63 +378,17 @@ def ex2d(d, m, b):
 
         # plot
         plt.plot(x, y, signoid(m * x - y + b), 'o', color=color)
-        print(signoid(m * x - y + b))
 
     plt.show()
 
     pass
 
 
-def ex2e(d, m, b, k):
+def show_simple_classifier(d, m, b, k):
     v = d[k]
     print('Point: ' + str(v))
     print(signoid(m * float(v[2]) - float(v[3]) + b))
 
-    pass
-
-
-def plot_neural_network(d):
-    '''
-    plots the linear classification in 3D
-    :param d: data
-    :return: nothing
-    '''
-
-    c = k_means_cluster(2, v_data)
-
-    # Distinguish which cluster is which flower
-    if c[0][0] < c[0][1]:
-        c0 = c[0][0]
-        c1 = c[0][1]
-    else:
-        c0 = c[0][1]
-        c1 = c[0][0]
-
-    # ax = plt.axes(projection = '3d')
-
-    t = np.linspace(0, 1, 20)
-    x = 2.0 + 5.0 ** t
-    y = 2.5 ** t
-    z = []
-    index = 0
-
-    for i in x:
-        z.append([])
-        for j in y:
-            output = compute_linear_classification([i, j], c0, c, d)
-            z[index].append(output)
-            # ax.plot(i, j, output, 'b.')
-        index += 1
-
-    plt.xlim(2.9, 7.1)
-    plt.ylim(0.9, 2.6)
-    # ax.zlim(-0.1, 1.1)
-
-    plt.xlabel('x')
-    plt.ylabel('y')
-    # ax.zlabel('z')
-
-    plt.show()
     pass
 
 
@@ -487,34 +441,48 @@ with open('CSDS391_P2\irisdata.csv') as file:
         data.append(row)
     t = np.linspace(0.0, 7.0, 200)
 
+    '''
+    Clustering
+    '''
     # TODO: Uncomment
-    # Exercise 1: Clustering
+    # Exercises: 1a, 1b, 1c, and 1d for k = 2
     # plot_decision_boundaries(2, data, t)
+    # Exercises: 1a, 1b, 1c, and 1d for k = 3
     # plot_decision_boundaries(3, data, t)
 
-    # Exercise 2: Linear Decision Boundaries
+    '''
+    Linear Decision Boundaries
+    '''
     # Get data for just the 2nd and 3rd iris classes
     v_data = []
     start = 50
     while start < 150:
         v_data.append(data[start])
         start += 1
-    # TODO: Uncomment
-    plot_data(v_data)
-    # signoid()
-    # plt.show()
 
-    # compute_linear_classification([4.75, 1.75], [4.25, 1.3], [5.25, 2.2], v_data)
-    # plot_decision_boundary(v_data, -7.0/3.0, 4)
-    # ex2c(v_data, -0.6, 4.8)
-    # plot_neural_network(v_data)
-    # ex2d(v_data, -0.6, 4.8)
+    # TODO: Uncomment
+    '''
+    # Exercise 2a
+    plot_data(v_data)
+    plt.show()
+
+    # Exercise 2b
+    # print(signoid(-0.5 * 4.7 - 1.1 + 4.1))
+
+    # Exercise 2c
+    plot_neural_network_decision_boundary(v_data, -0.6, 4.8)
+
+    # Exercise 2d
+    plot_neural_network(v_data, -0.6, 4.8)
+    # Exercise 2e
+    show_simple_classifier(v_data, -0.6, 4.8, 84)
+    show_simple_classifier(v_data, -0.6, 4.8, 99)
+    show_simple_classifier(v_data, -0.6, 4.8, 10)
+    show_simple_classifier(v_data, -0.6, 4.8, 67)
+    '''
 
     '''
-    ex2e(v_data, -0.6, 4.8, 84)
-    ex2e(v_data, -0.6, 4.8, 99)
-    ex2e(v_data, -0.6, 4.8, 10)
-    ex2e(v_data, -0.6, 4.8, 67)
+    Neural Networks
     '''
 
     # print(mse(v_data, -0.6, 4.8))
@@ -522,7 +490,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # ex2c(v_data, -0.5, 4.1)
     # print(mse(v_data, -0.5, 4.1))
 
-    exc3b(v_data, -0.6, 4.8, -0.3, 3.3)
+    # exc3b(v_data, -0.6, 4.8, -0.3, 3.3)
 
     plt.show()
 
