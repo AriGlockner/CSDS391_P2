@@ -393,7 +393,7 @@ def show_simple_classifier(d, m, b, k):
 
 
 '''
-Neural Networks
+Neural Networks Methods
 '''
 
 
@@ -445,11 +445,13 @@ with open('CSDS391_P2\irisdata.csv') as file:
     Clustering
     '''
     # TODO: Uncomment
+    '''
     # Exercises: 1a, 1b, 1c, and 1d for k = 2
-    # plot_decision_boundaries(2, data, t)
+    plot_decision_boundaries(2, data, t)
     # Exercises: 1a, 1b, 1c, and 1d for k = 3
-    # plot_decision_boundaries(3, data, t)
-
+    plot_decision_boundaries(3, data, t)
+    '''
+    
     '''
     Linear Decision Boundaries
     '''
@@ -474,6 +476,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
     # Exercise 2d
     plot_neural_network(v_data, -0.6, 4.8)
+    
     # Exercise 2e
     show_simple_classifier(v_data, -0.6, 4.8, 84)
     show_simple_classifier(v_data, -0.6, 4.8, 99)
@@ -488,8 +491,10 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # print(mse(v_data, -0.6, 4.8))
 
     # ex2c(v_data, -0.5, 4.1)
+    # Exercise 3a
     # print(mse(v_data, -0.5, 4.1))
 
+    # Exercise 3b
     # exc3b(v_data, -0.6, 4.8, -0.3, 3.3)
 
     plt.show()
