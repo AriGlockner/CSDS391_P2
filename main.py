@@ -452,7 +452,7 @@ def exc3b(d, w00, w10, w20, w01, w11, w21):
     return [mse0, mse1]
 
 
-def exc3e(d, w0, w1, w2):
+def exc3e(d, w0, w1, w2, plot=True):
     '''
     f(z) = 1/(1 + e-z)
     f'(z) = (e-z)/(1 + e-z)2
@@ -462,7 +462,8 @@ def exc3e(d, w0, w1, w2):
     f'(y) = -(e(y - mx - b))/(1 + e(y - mx - b))2
     '''
 
-    plot_data_and_line(d, w0, w1, w2)
+    if plot:
+        plot_data_and_line(d, w0, w1, w2)
 
     grad_w0 = 0.0
     grad_w1 = 0.0
@@ -493,19 +494,50 @@ def exc3e(d, w0, w1, w2):
         grad_w2 += df_dz * x2
 
     # Divide by the number of data points
-    grad_w0 /= -len(d)
-    grad_w1 /= -len(d)
-    grad_w2 /= -len(d)
+    grad_w0 /= len(d)
+    grad_w1 /= len(d)
+    grad_w2 /= len(d)
     # print([grad_w0, grad_w1, grad_w2])
 
     #
-    step_size = 10.0
-    plot_data_and_line(d, w0 + grad_w0 * step_size, w1 + grad_w1 * step_size, w2 + grad_w2 * step_size, 'r')
+    step_size = -10.0
+    if plot:
+        plot_data_and_line(d, w0 + grad_w0 * step_size, w1 + grad_w1 * step_size, w2 + grad_w2 * step_size, 'r')
+        plt.show()
 
-    plt.show()
+    return [grad_w0, grad_w1, grad_w2]
+
+
+'''
+Learning a Decision Boundary Through Optimization
+'''
+
+
+def exc4a(d, w0, w1, w2):
+    step = 0.1
+    threshold = 0.01
+    count = 0
+
+    while True:
+        g = exc3e(d, w0, w1, w2, False)
+        w0 -= g[0] * step
+        w1 -= g[1] * step
+        w2 -= g[2] * step
+        norm = math.sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2])
+
+        count += 1
+
+        if norm < threshold:
+            return [w0, w1, w2]
+
+
+def exc4b(d, w0, w1, w2):
+    plot_data_and_line(d, w0, w1, w2)
+
+    line = exc4a(d, w0, w1, w2)
+    plot_data_and_line(d, line[0], line[1], line[2], 'r')
 
     pass
-
 
 with open('CSDS391_P2\irisdata.csv') as file:
     # Used to take out the header from the file
@@ -586,12 +618,18 @@ with open('CSDS391_P2\irisdata.csv') as file:
     '''
 
     # Exercise 3e
-    exc3e(v_data, -45, 6, 10)
-    exc3e(v_data, -44, 7, 11)
+    # exc3e(v_data, -45, 6, 10)
+    # exc3e(v_data, -44, 7, 11)
 
     '''
     Learning a Decision Boundary Through Optimization
     '''
+
+    # Exercise 4a
+    # print(exc4a(v_data, -44, 7, 11))
+
+    # Exercise 4b
+    exc4b(v_data, -44, 7, 11)
 
     plt.show()
 
