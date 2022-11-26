@@ -1,6 +1,7 @@
 import math
 import random
 
+from mpl_toolkits import mplot3d
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -235,32 +236,207 @@ Linear Decision Boundaries Methods
 '''
 
 
-def compute_linear_classification(d, point):
+def signoid(z):
+    return 1.0 / (1.0 + math.exp(-z))
+
+
+def compute_linear_classification(point, c0, c1, d):
     """
+    :param c1: cluster 1
+    :param c0: cluster 2
     :param d: dataset
     :param point: the point to get calculate the percent likelihood of being verginica
     :return: a number between 0 and 1
     """
-    clusters = k_means_cluster(2, d)
 
-    # Distinguish which cluster is which flower
-    if clusters[0][0] < clusters[0][1]:
-        cluster0 = clusters[0][0]
-        cluster1 = clusters[0][1]
-    else:
-        cluster0 = clusters[0][1]
-        cluster1 = clusters[0][0]
+    t = np.linspace(3.0, 7.0, 200)
 
+    boundary = get_decision_bounds(c0, c1, t)
+
+    # Plot
+    plot_data(d)
+    plt.plot(c0[0], c0[1], 'ko')
+    plt.plot(c1[0], c1[1], 'ko')
+    plt.plot(t, boundary, 'c')
+    plt.ylim(0.9, 2.6)
+
+    # Slope of the boundary line
+    m = -1/(abs(c0[0] - c1[0]) / abs(c0[1] - c1[1]))
+
+    # b0 from boundary line
+    x0 = c0[0] + c1[0]
+    y0 = c0[1] + c1[1]
+    b0 = y0 + x0/m
+
+    # b1 = y + x/m -> from point
+    b1 = point[1] + point[0]/m
+
+    #
+    # y = mx + b0 -> boundary
+    # y = b1 - x/m
+    # b1 - x/m = mx + b0
+    # mx + x/m = (b1 - b0)
+    # x(m + 1/m) = (b1 - b0)
+    x = (b1 - b0) / (m + 1/m)
+    y = b1 - (b1 - b0) / (m * m + 1)
+    print(x)
+    print(y)
+    # plt.plot(x, y, 'yo')
+    # plt.plot(point[0], point[1], 'ro')
+    # plt.plot(-y, -x, 'yo')
+    plt.plot(point[0], point[1], 'yo')
+
+
+    # boundary = y_constant - (t - x_constant) / slope
+    print(signoid(0))
+
+    plt.show()
+
+    '''
+    w = get_distance(c0, c1) / 2.0
+    
     # Get the distance to each cluster
-    d0 = get_distance(point, cluster0)
-    d1 = get_distance(point, cluster1)
+    d0 = get_distance(point, c0)
+    d1 = get_distance(point, c1)
+
+    ''
+    x0 = point[0] - c0[0]
+    x1 = point[0] - c1[0]
+    x = x0 - x1
+
+    y0 = point[1] - c0[1]
+    y1 = point[1] - c1[1]
+    y = y0 - y1
+    ''
 
     # Calculate the classification function
     if d0 < d1:
         z = (d0 - d1) / d0
+        # x /= x0
+        # y /= y0
     else:
         z = (d0 - d1) / d1
-    return 1.0 / (1.0 + math.pow(math.e, -z))
+        # x /= x1
+        # y /= y1
+    # z = math.sqrt(x * x + y * y)
+    return 1.0 / (1.0 + math.exp(-z))
+    '''
+    return 0.0
+
+
+def ex2c(d, m, b):
+    # timescale
+    timescale = np.linspace(3.0, 7.0, 200)
+
+    # Plot
+    plot_data(d)
+    plt.plot(timescale, m * timescale + b, 'c')
+    plt.ylim(0.9, 2.6)
+    plt.show()
+
+    '''
+    w = get_distance(c0, c1) / 2.0
+
+    # Get the distance to each cluster
+    d0 = get_distance(point, c0)
+    d1 = get_distance(point, c1)
+
+    ''
+    x0 = point[0] - c0[0]
+    x1 = point[0] - c1[0]
+    x = x0 - x1
+
+    y0 = point[1] - c0[1]
+    y1 = point[1] - c1[1]
+    y = y0 - y1
+    ''
+
+    # Calculate the classification function
+    if d0 < d1:
+        z = (d0 - d1) / d0
+        # x /= x0
+        # y /= y0
+    else:
+        z = (d0 - d1) / d1
+        # x /= x1
+        # y /= y1
+    # z = math.sqrt(x * x + y * y)
+    return 1.0 / (1.0 + math.exp(-z))
+    '''
+    return 0.0
+
+
+def ex2d(d, m, b):
+    ax = plt.axes(projection='3d')
+    for v in d:
+        x = float(v[2])
+        y = float(v[3])
+        # choose a color
+        if v[4] == 'versicolor':
+            color = 'b'
+        else:
+            color = 'g'
+
+        # plot
+        plt.plot(x, y, signoid(m * x - y + b), 'o', color=color)
+        print(signoid(m * x - y + b))
+
+    plt.show()
+
+    pass
+
+
+def ex2e(d, m, b, k):
+    v = d[k]
+    print('Point: ' + str(v))
+    print(signoid(m * float(v[2]) - float(v[3]) + b))
+
+    pass
+
+
+def plot_neural_network(d):
+    '''
+    plots the linear classification in 3D
+    :param d: data
+    :return: nothing
+    '''
+
+    c = k_means_cluster(2, v_data)
+
+    # Distinguish which cluster is which flower
+    if c[0][0] < c[0][1]:
+        c0 = c[0][0]
+        c1 = c[0][1]
+    else:
+        c0 = c[0][1]
+        c1 = c[0][0]
+
+    # ax = plt.axes(projection = '3d')
+
+    t = np.linspace(0, 1, 20)
+    x = 2.0 + 5.0 ** t
+    y = 2.5 ** t
+    z = []
+    index = 0
+
+    for i in x:
+        z.append([])
+        for j in y:
+            output = compute_linear_classification([i, j], c0, c, d)
+            z[index].append(output)
+            # ax.plot(i, j, output, 'b.')
+        index += 1
+
+    plt.xlim(2.9, 7.1)
+    plt.ylim(0.9, 2.6)
+    # ax.zlim(-0.1, 1.1)
+
+    plt.xlabel('x')
+    plt.ylabel('y')
+    # ax.zlabel('z')
+
+    plt.show()
+    pass
 
 
 with open('CSDS391_P2\irisdata.csv') as file:
@@ -290,11 +466,22 @@ with open('CSDS391_P2\irisdata.csv') as file:
         v_data.append(data[start])
         start += 1
     # TODO: Uncomment
-    plot_data(v_data)
-    pts = [[4.3, 1.4], [5.0, 1.8], [5.6, 2.05]]
-    for pt in pts:
-        print(pt)
-        plt.plot(pt[0], pt[1], 'co')
-        print(compute_linear_classification(v_data, pt))
+    # plot_data(v_data)
+    # signoid()
+    # plt.show()
+
+    # compute_linear_classification([4.75, 1.75], [4.25, 1.3], [5.25, 2.2], v_data)
+    # plot_decision_boundary(v_data, -7.0/3.0, 4)
+    # ex2c(v_data, -0.6, 4.8)
+    # plot_neural_network(v_data)
+    # ex2d(v_data, -0.6, 4.8)
+
+    '''
+    ex2e(v_data, -0.6, 4.8, 84)
+    ex2e(v_data, -0.6, 4.8, 99)
+    ex2e(v_data, -0.6, 4.8, 10)
+    ex2e(v_data, -0.6, 4.8, 67)
+    '''
+    
     plt.show()
 
