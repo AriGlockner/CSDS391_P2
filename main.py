@@ -286,7 +286,6 @@ def compute_linear_classification(point, c0, c1, d):
     # plt.plot(-y, -x, 'yo')
     plt.plot(point[0], point[1], 'yo')
 
-
     # boundary = y_constant - (t - x_constant) / slope
     print(signoid(0))
 
@@ -439,6 +438,41 @@ def plot_neural_network(d):
     pass
 
 
+'''
+Neural Networks
+'''
+
+
+def mse(d, m, b):
+    # E = 1/2 * sum of n for (yn(xn, W1:L) - tn)^2
+    E = 0.0
+    for r in d:
+        if r[4] == 'versicolor':
+            E += math.pow(1 - signoid(m * float(r[2]) - float(r[3]) + b), 2)
+        else:
+            E += math.pow(signoid(m * float(r[2]) - float(r[3]) + b), 2)
+
+    return E / 2.0
+
+
+def exc3b(d, m1, b1, m2, b2):
+    plot_data(d)
+
+    t = np.linspace(3.0, 7.0, 200)
+
+    plt.plot(t, m1 * t + b1, 'c-')
+    plt.plot(t, m2 * t + b2, 'y-')
+    print(mse(d, m1, b1))
+    print(mse(d, m2, b2))
+
+    pass
+
+
+def exc3c():
+
+    pass
+
+
 with open('CSDS391_P2\irisdata.csv') as file:
     # Used to take out the header from the file
     heading = next(file)
@@ -466,7 +500,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
         v_data.append(data[start])
         start += 1
     # TODO: Uncomment
-    # plot_data(v_data)
+    plot_data(v_data)
     # signoid()
     # plt.show()
 
@@ -482,6 +516,13 @@ with open('CSDS391_P2\irisdata.csv') as file:
     ex2e(v_data, -0.6, 4.8, 10)
     ex2e(v_data, -0.6, 4.8, 67)
     '''
-    
+
+    # print(mse(v_data, -0.6, 4.8))
+
+    # ex2c(v_data, -0.5, 4.1)
+    # print(mse(v_data, -0.5, 4.1))
+
+    exc3b(v_data, -0.6, 4.8, -0.3, 3.3)
+
     plt.show()
 
