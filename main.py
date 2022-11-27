@@ -14,7 +14,7 @@ Clustering Methods
 '''
 
 
-def plot_data(d):
+def plot_data(d, is_title=False, title=''):
     for r in d:
         # Get the color based on the species
         c = 'black'
@@ -33,6 +33,8 @@ def plot_data(d):
     # Format Graph
     plt.xlabel('Petal Length')
     plt.ylabel('Petal Width')
+    if is_title:
+        plt.title(title)
     pass
 
 
@@ -236,7 +238,7 @@ Linear Decision Boundaries Methods
 '''
 
 
-def signoid(z):
+def sigmoid(z):
     return 1.0 / (1.0 + math.exp(-z))
 
 
@@ -287,7 +289,7 @@ def compute_linear_classification(point, c0, c1, d):
     plt.plot(point[0], point[1], 'yo')
 
     # boundary = y_constant - (t - x_constant) / slope
-    print(signoid(0))
+    print(sigmoid(0))
 
     plt.show()
 
@@ -333,35 +335,6 @@ def plot_neural_network_decision_boundary(d, m, b):
     plt.ylim(0.9, 2.6)
     plt.show()
 
-    '''
-    w = get_distance(c0, c1) / 2.0
-
-    # Get the distance to each cluster
-    d0 = get_distance(point, c0)
-    d1 = get_distance(point, c1)
-
-    ''
-    x0 = point[0] - c0[0]
-    x1 = point[0] - c1[0]
-    x = x0 - x1
-
-    y0 = point[1] - c0[1]
-    y1 = point[1] - c1[1]
-    y = y0 - y1
-    ''
-
-    # Calculate the classification function
-    if d0 < d1:
-        z = (d0 - d1) / d0
-        # x /= x0
-        # y /= y0
-    else:
-        z = (d0 - d1) / d1
-        # x /= x1
-        # y /= y1
-    # z = math.sqrt(x * x + y * y)
-    return 1.0 / (1.0 + math.exp(-z))
-    '''
     return 0.0
 
 
@@ -377,7 +350,7 @@ def plot_neural_network(d, m, b):
             color = 'g'
 
         # plot
-        plt.plot(x, y, signoid(m * x - y + b), 'o', color=color)
+        plt.plot(x, y, sigmoid(m * x - y + b), 'o', color=color)
 
     plt.show()
 
@@ -387,7 +360,7 @@ def plot_neural_network(d, m, b):
 def show_simple_classifier(d, m, b, k):
     v = d[k]
     print('Point: ' + str(v))
-    print(signoid(m * float(v[2]) - float(v[3]) + b))
+    print(sigmoid(m * float(v[2]) - float(v[3]) + b))
 
     pass
 
@@ -395,15 +368,9 @@ def show_simple_classifier(d, m, b, k):
 '''
 Neural Networks Methods
 '''
+
+
 def plot_data_and_line(d, w0, w1, w2, color='c'):
-    '''
-    plot_data(d)
-
-    # z = w0 + w1 * x1 + w2 * x2 = 0
-    # x2 = -(w0 - w1 * x1)/w2
-    plt.plot(time_scale, -(w0 - w1 * time_scale)/w2, line_settings)
-    '''
-
     plot_data(d)
     plt.axline(xy1=(0, -w0 / w2), xy2=(-w0 / w1, 0), color=color)
 
@@ -432,7 +399,7 @@ def mse(d, w0, w1, w2):
         x2 = float(r[3])
 
         z = w0 + w1 * x1 + w2 * x2
-        sigma = signoid(z)
+        sigma = sigmoid(z)
 
         v = get_point_actual(r[4])
 
@@ -479,7 +446,7 @@ def exc3e(d, w0, w1, w2, plot=True):
         v = get_point_actual(r[4])
 
         # Calculate Sigma
-        sigma = signoid(z)
+        sigma = sigmoid(z)
         # print(v, sigma)
 
         # Calculate the derivatives of the sigmas
@@ -583,7 +550,6 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # Exercises: 1a, 1b, 1c, and 1d for k = 3
     plot_decision_boundaries(3, data, t)
     '''
-
     '''
     Linear Decision Boundaries
     '''
@@ -595,17 +561,19 @@ with open('CSDS391_P2\irisdata.csv') as file:
         start += 1
 
     # TODO: Uncomment
-    '''
     # Exercise 2a
-    plot_data(v_data)
+    '''
+    plot_data(v_data, True, 'Versicolor and Virginica Iris Data')
     plt.show()
+    '''
 
     # Exercise 2b
-    # print(signoid(-0.5 * 4.7 - 1.1 + 4.1))
+    print(sigmoid(-0.5 * 4.7 - 1.1 + 4.1))
 
     # Exercise 2c
-    plot_neural_network_decision_boundary(v_data, -0.6, 4.8)
+    # plot_neural_network_decision_boundary(v_data, -0.6, 4.8)
 
+    '''
     # Exercise 2d
     plot_neural_network(v_data, -0.6, 4.8)
     
@@ -615,7 +583,6 @@ with open('CSDS391_P2\irisdata.csv') as file:
     show_simple_classifier(v_data, -0.6, 4.8, 10)
     show_simple_classifier(v_data, -0.6, 4.8, 67)
     '''
-
     '''
     Neural Networks
     '''
@@ -652,7 +619,7 @@ with open('CSDS391_P2\irisdata.csv') as file:
     # exc4b(v_data, -44, 7, 11)
 
     # Exercise 4c
-    exc4c(v_data)
+    # exc4c(v_data)
 
     '''
     3d)
