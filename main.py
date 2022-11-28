@@ -1,13 +1,9 @@
 import math
 import random
-
-from mpl_toolkits import mplot3d
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import csv
-
-from numpy import pi
 
 '''
 Clustering Methods
@@ -17,7 +13,7 @@ Clustering Methods
 def plot_data(d, is_title=False, title=''):
     for r in d:
         # Get the color based on the species
-        c = 'black'
+
         if r[4] == 'setosa':
             c = 'red'
         elif r[4] == 'versicolor':
@@ -242,91 +238,7 @@ def sigmoid(z):
     return 1.0 / (1.0 + math.exp(-z))
 
 
-# TODO: Remove???
-def compute_linear_classification(point, c0, c1, d):
-    """
-    :param c1: cluster 1
-    :param c0: cluster 2
-    :param d: dataset
-    :param point: the point to get calculate the percent likelihood of being verginica
-    :return: a number between 0 and 1
-    """
-
-    t = np.linspace(3.0, 7.0, 200)
-
-    boundary = get_decision_bounds(c0, c1, t)
-
-    # Plot
-    plot_data(d)
-    plt.plot(c0[0], c0[1], 'ko')
-    plt.plot(c1[0], c1[1], 'ko')
-    plt.plot(t, boundary, 'c')
-    plt.ylim(0.9, 2.6)
-
-    # Slope of the boundary line
-    m = -1/(abs(c0[0] - c1[0]) / abs(c0[1] - c1[1]))
-
-    # b0 from boundary line
-    x0 = c0[0] + c1[0]
-    y0 = c0[1] + c1[1]
-    b0 = y0 + x0/m
-
-    # b1 = y + x/m -> from point
-    b1 = point[1] + point[0]/m
-
-    #
-    # y = mx + b0 -> boundary
-    # y = b1 - x/m
-    # b1 - x/m = mx + b0
-    # mx + x/m = (b1 - b0)
-    # x(m + 1/m) = (b1 - b0)
-    x = (b1 - b0) / (m + 1/m)
-    y = b1 - (b1 - b0) / (m * m + 1)
-    print(x)
-    print(y)
-    # plt.plot(x, y, 'yo')
-    # plt.plot(point[0], point[1], 'ro')
-    # plt.plot(-y, -x, 'yo')
-    plt.plot(point[0], point[1], 'yo')
-
-    # boundary = y_constant - (t - x_constant) / slope
-    print(sigmoid(0))
-
-    plt.show()
-
-    '''
-    w = get_distance(c0, c1) / 2.0
-    
-    # Get the distance to each cluster
-    d0 = get_distance(point, c0)
-    d1 = get_distance(point, c1)
-
-    ''
-    x0 = point[0] - c0[0]
-    x1 = point[0] - c1[0]
-    x = x0 - x1
-
-    y0 = point[1] - c0[1]
-    y1 = point[1] - c1[1]
-    y = y0 - y1
-    ''
-
-    # Calculate the classification function
-    if d0 < d1:
-        z = (d0 - d1) / d0
-        # x /= x0
-        # y /= y0
-    else:
-        z = (d0 - d1) / d1
-        # x /= x1
-        # y /= y1
-    # z = math.sqrt(x * x + y * y)
-    return 1.0 / (1.0 + math.exp(-z))
-    '''
-    return 0.0
-
-
-def plot_neural_network_decision_boundary(d, m, b):
+def plot_neural_network_decision_boundary(d, m, b, point):
     # timescale
     timescale = np.linspace(3.0, 7.0, 200)
 
@@ -337,8 +249,8 @@ def plot_neural_network_decision_boundary(d, m, b):
     plt.title('Decision Boundary for the Non-Linearity Above Overlaid on the Iris Data')
     plt.show()
 
-    # TODO: Update return???
-    return 0.0
+    # z = mx - y + b
+    return 1.0 - sigmoid(m * point[0] - point[1] + b)
 
 
 def plot_neural_network(d, m, b):
@@ -373,12 +285,15 @@ Neural Networks Methods
 '''
 
 
-def plot_data_and_line(d, w0, w1, w2, color='c'):
+def plot_data_and_line(d, w0, w1, w2, color='c', marker='solid', show=False):
     plot_data(d)
-    plt.axline(xy1=(0, -w0 / w2), xy2=(-w0 / w1, 0), color=color)
+    plt.axline(xy1=(0, -w0 / w2), xy2=(-w0 / w1, 0), color=color, linestyle=marker)
 
     plt.xlim(2.9, 7.1)
     plt.ylim(0.9, 2.6)
+
+    if show:
+        plt.show()
 
     pass
 
@@ -390,11 +305,10 @@ def get_point_actual(flower):
         return 1.0
 
 
-def mse(d, w0, w1, w2):
-    plot_data_and_line(d, w0, w1, w2)
-
+def mse(d, w0, w1, w2, color='c', marker='-', plot=True):
+    if not plot:
+        plot_data_and_line(d, w0, w1, w2, color=color, marker=marker)
     # z = w0 + w1 * x1 + w2 * x2
-
     # E = 1/2 * sum of n for (yn(xn, W1:L) - tn)^2
     E = 0.0
     for r in d:
@@ -410,16 +324,17 @@ def mse(d, w0, w1, w2):
 
         E += math.pow(v - sigma, 2)
 
-    return E / len(d)
+    return E / (2.0 * len(d))
 
 
 def compute_mse_for_2_points(d, w00, w10, w20, w01, w11, w21):
-    plot_data_and_line(d, w00, w10, w20)
-    mse0 = mse(d, w00, w10, w20)
-    plot_data_and_line(d, w01, w11, w21, 'r')
-    mse1 = mse(d, w01, w11, w21)
+    # plot_data_and_line(d, w00, w10, w20, 'c', 'solid')
+    mse0 = mse(d, w00, w10, w20, 'c', 'solid')
+    # plt.show()
+    # plot_data_and_line(d, w01, w11, w21, 'c', 'solid')
+    mse1 = mse(d, w01, w11, w21, 'r', 'dashed')
     plt.show()
-    return [mse0, mse1]
+    return 0 # [mse0, mse1]
 
 
 def compute_summed_gradient(d, w0, w1, w2, plot=True):
@@ -483,53 +398,62 @@ Learning a Decision Boundary Through Optimization
 '''
 
 
-def optimize_gradient(d, w0, w1, w2):
+def optimize_gradient(d, w0, w1, w2, plot_learning_curve=False):
     step = 0.1
-    threshold = 0.01
-    count = 0
-
-    print('Iteration:\tNorm of Gradient:')
+    stopping_criteria = 0.01
+    learning_curve = []
 
     while True:
+        # Calculate the Gradient with respect to z
         g = compute_summed_gradient(d, w0, w1, w2, False)
+        # Calculate the Gradient with respect to w0, w1, and w2 respectively
         w0 -= g[0] * step
         w1 -= g[1] * step
         w2 -= g[2] * step
+
+        # Calculate the norm and store the norm in the learning curve list
         norm = math.sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2])
+        learning_curve.append(norm)
 
-        count += 1
-
-        print(count, norm)
-
-        if norm < threshold:
-            print()
+        # Stop optimizing the gradient when the norm is less than the stopping criteria
+        if norm < stopping_criteria:
+            if plot_learning_curve:
+                return [[w0, w1, w2], learning_curve]
             return [w0, w1, w2]
 
 
-def show_optimize_gradient(d, w0, w1, w2):
+def show_optimize_gradient(d, w0, w1, w2, show_curve=True):
+    # Plot the Initial line
     plot_data_and_line(d, w0, w1, w2)
 
-    line = optimize_gradient(d, w0, w1, w2)
-    plot_data_and_line(d, line[0], line[1], line[2], 'r')
+    # Plot the gradient curve
+    if show_curve:
+        # Plot the final line
+        line, curve = optimize_gradient(d, w0, w1, w2, True)
+        plot_data_and_line(d, line[0], line[1], line[2], 'r')
+        plt.show()
 
-    return line
+        # Plot the gradient curve
+        plt.plot(range(len(curve)), curve, 'k')
+        plt.xlabel('Iterations')
+        plt.ylabel('Norm of Gradient')
+        plt.show()
+        return line, curve
+
+    # Don't Plot the Gradient Curve
+    else:
+        # Plot the final line
+        line = optimize_gradient(d, w0, w1, w2)
+        plot_data_and_line(d, line[0], line[1], line[2], 'r')
+        plt.show()
+        return line
 
 
 def random_show_optimize_gradient(d):
+    # Return the output of the show_optimize_gradient method using a random seed
     np.random.seed(1234)
     w = np.random.uniform(-5, 5, 3)
-    print(w)
-    output = show_optimize_gradient(d, w[0], w[1], w[2])
-    print(output)
-
-    '''
-    3d)
-    Trial and error
-    3e)
-    norm of the gradient was close to 0    
-    '''
-
-    pass
+    return show_optimize_gradient(d, w[0], w[1], w[2], True)
 
 
 with open('CSDS391_P2\irisdata.csv') as file:
@@ -549,16 +473,16 @@ with open('CSDS391_P2\irisdata.csv') as file:
     '''
     Clustering
     '''
-    # TODO: Uncomment
-    '''
+
     # Exercises: 1a, 1b, 1c, and 1d for k = 2
     plot_decision_boundaries(2, data, t)
     # Exercises: 1a, 1b, 1c, and 1d for k = 3
     plot_decision_boundaries(3, data, t)
-    '''
+
     '''
     Linear Decision Boundaries
     '''
+
     # Get data for just the 2nd and 3rd iris classes
     v_data = []
     start = 50
@@ -566,56 +490,50 @@ with open('CSDS391_P2\irisdata.csv') as file:
         v_data.append(data[start])
         start += 1
 
-    # TODO: Uncomment
     # Exercise 2a
-    '''
     plot_data(v_data, True, 'Versicolor and Virginica Iris Data')
     plt.show()
-    
     # Exercise 2b
     print(sigmoid(-0.5 * 4.7 - 1.1 + 4.1))
     # Exercise 2c
-    print(plot_neural_network_decision_boundary(v_data, -0.6, 4.8))
+    print(plot_neural_network_decision_boundary(v_data, -0.6, 4.8, [5.5, 2.0]))
     # Exercise 2d
     plot_neural_network(v_data, -0.6, 4.8)
 
     # Exercise 2e
+    print()
     show_simple_classifier(v_data, -0.6, 4.8, 84)
     show_simple_classifier(v_data, -0.6, 4.8, 99)
     show_simple_classifier(v_data, -0.6, 4.8, 10)
     show_simple_classifier(v_data, -0.6, 4.8, 67)
-    '''
+    print()
+
     '''
     Neural Networks
     '''
-    # TODO: Change from m, b to w0, w1, w2
-    '''
-    # print(mse(v_data, -0.6, 4.8))
-    # ex2c(v_data, -0.5, 4.1)
+
     # Exercise 3a
+    print('mse:')
     print(mse(v_data, -45, 6, 10))
     print(mse(v_data, -44, 7, 11))
-    
+    print()
+
     # Exercise 3b
-    print(compute_mse_for_2_points(v_data, -45, 6, 10, -30, 1, 15))
+    # print(compute_mse_for_2_points(v_data, -45, 6, 10, -30, 1, 15))
+    plot_data_and_line(v_data, -45, 6, 10, 'c', 'solid', True)
+    plot_data_and_line(v_data, -30, 1, 15, 'c', 'solid', True)
     
     # Exercise 3e
     compute_summed_gradient(v_data, -45, 6, 10)
     compute_summed_gradient(v_data, -44, 7, 11)
-    '''
+
     '''
     Learning a Decision Boundary Through Optimization
     '''
-    '''
+
     # Exercise 4a
     print(optimize_gradient(v_data, -44, 7, 11))
-    
     # Exercise 4b
     show_optimize_gradient(v_data, -44, 7, 11)
-
     # Exercise 4c
-    random_show_optimize_gradient(v_data) 
-    '''
-
-    plt.show()
-
+    random_show_optimize_gradient(v_data)
