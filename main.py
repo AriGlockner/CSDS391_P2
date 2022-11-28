@@ -242,6 +242,7 @@ def sigmoid(z):
     return 1.0 / (1.0 + math.exp(-z))
 
 
+# TODO: Remove???
 def compute_linear_classification(point, c0, c1, d):
     """
     :param c1: cluster 1
@@ -333,8 +334,10 @@ def plot_neural_network_decision_boundary(d, m, b):
     plot_data(d)
     plt.plot(timescale, m * timescale + b, 'c')
     plt.ylim(0.9, 2.6)
+    plt.title('Decision Boundary for the Non-Linearity Above Overlaid on the Iris Data')
     plt.show()
 
+    # TODO: Update return???
     return 0.0
 
 
@@ -410,7 +413,7 @@ def mse(d, w0, w1, w2):
     return E / len(d)
 
 
-def exc3b(d, w00, w10, w20, w01, w11, w21):
+def compute_mse_for_2_points(d, w00, w10, w20, w01, w11, w21):
     plot_data_and_line(d, w00, w10, w20)
     mse0 = mse(d, w00, w10, w20)
     plot_data_and_line(d, w01, w11, w21, 'r')
@@ -419,7 +422,7 @@ def exc3b(d, w00, w10, w20, w01, w11, w21):
     return [mse0, mse1]
 
 
-def exc3e(d, w0, w1, w2, plot=True):
+def compute_summed_gradient(d, w0, w1, w2, plot=True):
     '''
     f(z) = 1/(1 + e-z)
     f'(z) = (e-z)/(1 + e-z)2
@@ -480,13 +483,15 @@ Learning a Decision Boundary Through Optimization
 '''
 
 
-def exc4a(d, w0, w1, w2):
+def optimize_gradient(d, w0, w1, w2):
     step = 0.1
     threshold = 0.01
     count = 0
 
+    print('Iteration:\tNorm of Gradient:')
+
     while True:
-        g = exc3e(d, w0, w1, w2, False)
+        g = compute_summed_gradient(d, w0, w1, w2, False)
         w0 -= g[0] * step
         w1 -= g[1] * step
         w2 -= g[2] * step
@@ -497,23 +502,24 @@ def exc4a(d, w0, w1, w2):
         print(count, norm)
 
         if norm < threshold:
+            print()
             return [w0, w1, w2]
 
 
-def exc4b(d, w0, w1, w2):
+def show_optimize_gradient(d, w0, w1, w2):
     plot_data_and_line(d, w0, w1, w2)
 
-    line = exc4a(d, w0, w1, w2)
+    line = optimize_gradient(d, w0, w1, w2)
     plot_data_and_line(d, line[0], line[1], line[2], 'r')
 
     return line
 
 
-def exc4c(d):
+def random_show_optimize_gradient(d):
     np.random.seed(1234)
     w = np.random.uniform(-5, 5, 3)
     print(w)
-    output = exc4b(d, w[0], w[1], w[2])
+    output = show_optimize_gradient(d, w[0], w[1], w[2])
     print(output)
 
     '''
@@ -565,18 +571,14 @@ with open('CSDS391_P2\irisdata.csv') as file:
     '''
     plot_data(v_data, True, 'Versicolor and Virginica Iris Data')
     plt.show()
-    '''
-
+    
     # Exercise 2b
     print(sigmoid(-0.5 * 4.7 - 1.1 + 4.1))
-
     # Exercise 2c
-    # plot_neural_network_decision_boundary(v_data, -0.6, 4.8)
-
-    '''
+    print(plot_neural_network_decision_boundary(v_data, -0.6, 4.8))
     # Exercise 2d
     plot_neural_network(v_data, -0.6, 4.8)
-    
+
     # Exercise 2e
     show_simple_classifier(v_data, -0.6, 4.8, 84)
     show_simple_classifier(v_data, -0.6, 4.8, 99)
@@ -587,46 +589,32 @@ with open('CSDS391_P2\irisdata.csv') as file:
     Neural Networks
     '''
     # TODO: Change from m, b to w0, w1, w2
-
+    '''
     # print(mse(v_data, -0.6, 4.8))
     # ex2c(v_data, -0.5, 4.1)
     # Exercise 3a
-    # print(mse(v_data, -45, 6, 10))
-    # print(mse(v_data, -44, 7, 11))
-
+    print(mse(v_data, -45, 6, 10))
+    print(mse(v_data, -44, 7, 11))
+    
     # Exercise 3b
-    # print(exc3b(v_data, -45, 6, 10, -30, 1, 15))
-
-    '''
-    3c)
+    print(compute_mse_for_2_points(v_data, -45, 6, 10, -30, 1, 15))
     
-    3d)
-    
-    '''
-
     # Exercise 3e
-    # exc3e(v_data, -45, 6, 10)
-    # exc3e(v_data, -44, 7, 11)
-
+    compute_summed_gradient(v_data, -45, 6, 10)
+    compute_summed_gradient(v_data, -44, 7, 11)
+    '''
     '''
     Learning a Decision Boundary Through Optimization
     '''
-
+    '''
     # Exercise 4a
-    # print(exc4a(v_data, -44, 7, 11))
-
+    print(optimize_gradient(v_data, -44, 7, 11))
+    
     # Exercise 4b
-    # exc4b(v_data, -44, 7, 11)
+    show_optimize_gradient(v_data, -44, 7, 11)
 
     # Exercise 4c
-    # exc4c(v_data)
-
-    '''
-    3d)
-    Trial and error
-    
-    3e)
-    norm of the gradient was close to 0    
+    random_show_optimize_gradient(v_data) 
     '''
 
     plt.show()
