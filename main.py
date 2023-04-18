@@ -472,14 +472,14 @@ with open('CSDS391_P2\irisdata.csv') as file:
 
     '''
     Clustering
-    '''
+    ''
 
     # Exercises: 1a, 1b, 1c, and 1d for k = 2
     plot_decision_boundaries(2, data, t)
     # Exercises: 1a, 1b, 1c, and 1d for k = 3
     plot_decision_boundaries(3, data, t)
 
-    '''
+    ''
     Linear Decision Boundaries
     '''
 
